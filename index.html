@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Georgia Hospital System Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        /* ===============================
+           Base Styles
+        =============================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===============================
+           Header
+        =============================== */
+        header {
+            background: linear-gradient(135deg, #6fb353, #5a9445);
+            color: white;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .logo-img {
+            height: 80px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .header-content {
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        .header-content h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header-content p {
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        /* ===============================
+           Three-column Layout (Sidebar | Content | Map)
+        =============================== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 260px 1fr 350px;
+            gap: 20px;
+            margin-top: 10px;
+            padding-left: 10px;
+            padding-right: 10px;
+            align-items: flex-start;
+        }
+
+        .map-section {
+            height: 100%;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-section h2 {
+            background-color: #6fb353;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+        }
+
+        #mainMap {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar,
+        .content-area {
+            position: relative;
+            top: auto;
+            align-self: start;
+            height: auto;
+            overflow: visible;
+        }
+
+        /* =========================================
+           FIX — Index Page Map Behavior (Safe Scoped)
+        ========================================= */
+        .index-page .map-column {
+            position: sticky;
+            top: 10px;
+            align-self: start;
+        }
+
+        .index-page .map-section {
+            position: sticky;
+            top: 10px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: auto !important;
+            display: block !important;
+        }
+
+        .index-page #mainMap {
+            width: 100%;
+            height: 500px !important;  /* fixed visible height */
+            flex: none !important;
+            display: block;
+        }
+
+        /* ===============================
+           Sidebar
+        =============================== */
+        .sidebar {
+            background: #e7f5e5;
+            border: 2px solid #6fb353;
+            border-radius: 8px;
+            padding: 15px;
+            width: 260px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .location-search {
+            background: #eee;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .location-search h3 {
+            margin-top: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Enhanced Filter Styles */
+        .sidebar details {
+            margin-bottom: 15px;
+            border: 1px solid #cde3c7;
+            border-radius: 6px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .sidebar details summary {
+            background: #6fb353;
+            color: #fff;
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar details summary::marker {
+            display: none;
+        }
+
+        .sidebar details summary::after {
+            content: "▼";
+            font-size: 0.75em;
+            margin-left: 6px;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            background: #f8f8f8;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .filter-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .filter-group input[type="checkbox"] {
+            margin: 0;
+        }
+
+        /* Sidebar buttons */
+        .filter-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-actions button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #applyFiltersBtn {
+            background: #6fb353;
+            color: white;
+        }
+
+        #applyFiltersBtn:hover {
+            background: #5a9445;
+        }
+
+        #resetFiltersBtn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        #resetFiltersBtn:hover {
+            background: #7f8c8d;
+        }
+
+        #downloadDataBtn {
+            background: #3498db;
+            color: white;
+        }
+
+        #downloadDataBtn:hover {
+            background: #2980b9;
+        }
+
+        #applyLocationBtn {
+            margin-top: 10px;
+            background: #6fb353;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: background 0.2s ease;
+        }
+
+        #applyLocationBtn:hover {
+            background: #5a9445;
+        }
+
+        /* ===============================
+           Filters, Metrics, and Toggles
+        =============================== */
+        .view-toggle {
+            background: #e7f5e5;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .view-toggle h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .view-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            background: #6fb353;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            background: #5a9445;
+        }
+
+        .toggle-btn.active {
+            background: #f48810;
+        }
+
+        /* ===============================
+           Results Table
+        =============================== */
+        .search-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .sort-select-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-bottom: 20px;
+        }
+
+        .results-table th {
+            background-color: #f0f0f0;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .results-table td {
+            padding: 12px 15px;
+            border: 2px solid #6fb353;
+            border-radius: 8px;
+        }
+
+        .results-table tr {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===============================
+           Buttons (Two per Row)
+        =============================== */
+        .details-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toggle-detail,
+        .view-full-detail {
+            background: #f48810;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.2s ease;
+            width: 140px;
+            text-align: center;
+        }
+
+        .toggle-detail:hover,
+        .view-full-detail:hover {
+            background: #d9740e;
+        }
+
+        @media (min-width: 992px) {
+            .details-buttons {
+                flex-direction: row;
+            }
+        }
+
+        /* ===============================
+           Detail Rows (Expandable)
+        =============================== */
+        .hospital-detail-row {
+            background-color: #f9f9f9;
+            border-top: 2px solid #6fb353;
+        }
+
+        .detail-info {
+            padding: 10px 20px;
+            font-size: 0.95em;
+            background: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+            line-height: 1.4;
+        }
+
+        /* ===============================
+           Star Ratings
+        =============================== */
+        .star-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .star {
+            width: 22px;
+            height: 22px;
+            fill: #a4cc95;
+        }
+
+        .star.full {
+            fill: #f48810;
+        }
+
+        .star.half {
+            fill: url(#halfGradient);
+        }
+
+        /* ===============================
+           Footer
+        =============================== */
+        footer {
+            background: linear-gradient(135deg, #6fb353, #5a9445);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* ===============================
+           Enhanced Results Styles
+        =============================== */
+        .grade-text {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 4px;
+        }
+
+        .hospital-location {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .distance, .hospital-size {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .detail-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        /* ===============================
+           Map Popup Styles
+        =============================== */
+        .map-popup {
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .map-popup .popup-grade {
+            font-weight: bold;
+            margin: 8px 0;
+            color: #333;
+        }
+
+        /* ===============================
+           Error Popup Styles
+        =============================== */
+        .error-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        .error-popup.visible {
+            transform: translateX(0);
+        }
+
+        /* ===============================
+           Responsive Adjustments
+        =============================== */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .map-column {
+                position: static;
+                height: auto;
+            }
+            #mainMap {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .footer-content {
+                flex-direction: column;
+            }
+
+            .results-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .details-grid,
+            .detail-page-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hospital-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+            
+            .map-column {
+                order: 3;
+            }
+            
+            .detail-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .view-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* ===============================
+           Loading State
+        =============================== */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ===============================
+           Active Filter Indicators
+        =============================== */
+        .toggle-btn.active {
+            background: #f48810;
+            color: white;
+        }
+
+        /* INLINE STAR ALIGNMENT IN PREVIEW PANE */
+        .detail-info p.inline-stars {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+        }
+
+        .detail-info .star-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            line-height: 1;
+        }
+
+        .detail-info .star {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Optional: neat label column alignment */
+        .detail-info p.inline-stars strong {
+            min-width: 85px;
+            display: inline-block;
+            font-size: 0.95em;
+        }
+
+        .hospital-title {
+            text-align: center;
+            margin: 20px 0 10px;
+        }
+    </style>
+</head>
+<body class="index-page">
+    <header>
+        <div class="container">
+            <div class="top-nav">
+                <div class="logo">
+                    <img src="https://via.placeholder.com/80x80/6fb353/ffffff?text=GW" width="auto" height="80" />
+                    <span>Georgia Watch</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="active">Rankings</a>
+                    <a href="#methodology">Methodology</a>
+                    <a href="https://georgiawatch.org/about/">About Us</a>
+                    <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+                </div>
+            </div>
+            
+            <div class="header-content">
+                <h1>GEORGIA WATCH</h1>
+                <p>Advocating for patients and protecting consumers since 2002</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <h3>View Results By:</h3>
+          <div class="view-buttons">
+            <button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
+            <button id="viewIndividualsBtn" class="toggle-btn active">Individual Hospitals</button>
+          </div>
+          <div id="individualOptions" style="display: block; margin-top: 10px;">
+            <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
+            <div class="view-buttons">
+              <button id="filterCriticalBtn" class="toggle-btn">Critical Access</button>
+              <button id="filterAcuteBtn" class="toggle-btn">Acute Care</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Search -->
+        <div class="location-search">
+          <h3>Location Search</h3>
+          <label>
+            Enter ZIP Code:
+            <input type="text" id="zipInput" placeholder="12345" maxlength="5">
+          </label>
+          <br>
+          <label>
+            Radius:
+            <select id="radiusSelect">
+              <option value="5">5 miles</option>
+              <option value="10">10 miles</option>
+              <option value="15">15 miles</option>
+              <option value="20">20 miles</option>
+              <option value="25">25 miles</option>
+              <option value="30">30 miles</option>
+            </select>
+          </label>
+          <button id="applyLocationBtn">Apply Location</button>
+        </div>
+
+        <!-- Hospital Type -->
+        <details open>
+          <summary>Refine by Hospital Type</summary>
+          <div class="filter-group">
+            <label><input type="checkbox" value="Urban" data-filter="type"> Urban</label>
+            <label><input type="checkbox" value="Rural" data-filter="type"> Rural</label>
+            <label><input type="checkbox" value="Non-profit" data-filter="type"> Non-profit</label>
+            <label><input type="checkbox" value="For Profit" data-filter="type"> For Profit</label>
+            <label><input type="checkbox" value="Church Affiliated" data-filter="type"> Church Affiliated</label>
+            <label><input type="checkbox" value="Academic Medical Center" data-filter="type"> Academic Medical Center</label>
+            <label><input type="checkbox" value="Safety Net" data-filter="type"> Safety Net</label>
+          </div>
+        </details>
+
+        <!-- Key Metric Categories -->
+        <details>
+          <summary>Refine by Metrics</summary>
+          <div class="filter-group">
+            <label><input type="checkbox" value="Financial Transparency and Institutional Health" data-filter="metric"> Financial Transparency & Institutional Health</label>
+            <label><input type="checkbox" value="Community Benefit Spending" data-filter="metric"> Community Benefit Spending</label>
+            <label><input type="checkbox" value="Healthcare Affordability and Billing" data-filter="metric"> Healthcare Affordability & Billing</label>
+            <label><input type="checkbox" value="Healthcare Access and Social Responsibility" data-filter="metric"> Healthcare Access & Social Responsibility</label>
+          </div>
+        </details>
+
+        <!-- Action Buttons -->
+        <div class="filter-actions">
+          <button id="applyFiltersBtn">Apply Filters</button>
+          <button id="resetFiltersBtn" type="reset">Reset</button>
+          <button id="downloadDataBtn">Download Data</button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="content-area">
+        <section class="search-section">
+          <div class="results-header">
+            <span id="resultsCount">Viewing 0 results</span>
+            <label for="sortSelect" class="sort-select-label">
+              Sort by:
+              <select id="sortSelect">
+                <option value="grade">Grade (High to Low)</option>
+                <option value="distance">Distance (Closest First)</option>
+                <option value="name">Hospital Name (A–Z)</option>
+                <option value="size">Bed Size (Small → Extra Large)</option>
+              </select>
+            </label>
+          </div>
+
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th width="10%">Score</th>
+                <th width="70%">Hospital Name & Location</th>
+                <th width="20%">Details</th>
+              </tr>
+            </thead>
+            <tbody id="hospitalResults">
+              <!-- Results populated by JavaScript -->
+            </tbody>
+          </table>
+        </section>
+      </main>
+
+      <!-- Map Column (Sticky) -->
+      <div class="map-column">
+        <section class="map-section">
+          <h2>HOSPITAL LOCATIONS</h2>
+          <div id="mainMap"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Methodology Section -->
+    <section id="methodology" class="methodology-content" style="padding: 40px 20px; background: #fff; margin-top: 40px;">
+        <div class="container">
+            <h2 style="color: #6fb353; margin-bottom: 20px;">Our Methodology</h2>
+            <p style="margin-bottom: 20px; line-height: 1.6;">
+                Georgia Watch's Hospital Transparency Scorecard measures hospital performance across four main categories.
+                Each category contributes to an overall score reflecting transparency, affordability, and social responsibility.
+            </p>
+            
+            <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div class="category-card" style="background: #fff; border: 2px solid #6fb35333; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <h3 style="color: #6fb353; margin-bottom: 8px;">Financial Transparency & Institutional Health</h3>
+                    <p>Measures how openly hospitals share financial data and maintain fiscal stability, transparency, and staff investment.</p>
+                </div>
+                <div class="category-card" style="background: #fff; border: 2px solid #6fb35333; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <h3 style="color: #6fb353; margin-bottom: 8px;">Community Benefit Spending</h3>
+                    <p>Evaluates how hospitals invest in their communities relative to their tax-exempt benefits and strategic outreach programs.</p>
+                </div>
+                <div class="category-card" style="background: #fff; border: 2px solid #6fb35333; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <h3 style="color: #6fb353; margin-bottom: 8px;">Healthcare Affordability & Billing</h3>
+                    <p>Assesses billing practices, financial assistance availability, and affordability for patients of varying income levels.</p>
+                </div>
+                <div class="category-card" style="background: #fff; border: 2px solid #6fb35333; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <h3 style="color: #6fb353; margin-bottom: 8px;">Healthcare Access & Social Responsibility</h3>
+                    <p>Examines service range, workforce equity, demographic alignment, and community access to essential health resources.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="#">Georgia Watch</a></li>
+                    <li><a href="#">Rankings</a></li>
+                    <li><a href="#methodology">Methodology</a></li>
+                    <li><a href="https://georgiawatch.org/about/">About Us</a></li>
+                    <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
+                    <li><a href="#">Legal/Privacy</a></li>
+                    <li><a href="#">Site Map</a></li>
+                </ul>
+                <div class="copyright">
+                    <p>Georgia Watch is a non-profit, nonpartisan 501(c)3 organization. © 2024 Georgia Watch. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // ===============================
+        // Data Storage and State
+        // ===============================
+        let hospitalData = [];
+        let filteredHospitalData = [];
+        let currentView = 'individuals'; // 'systems' or 'individuals'
+        let currentHospitalType = null; // 'Critical Access' or 'Acute Care'
+        let map;
+        let mapMarkers = [];
+
+        // Sample hospital data for demonstration
+        const sampleHospitalData = [
+            {
+                RECORD_ID: 1,
+                Name: "Atlanta Medical Center",
+                City: "Atlanta",
+                State: "GA",
+                Zip: "30303",
+                TIER_1_GRADE_Lown_Composite: "A",
+                TIER_2_GRADE_Outcome: "A-",
+                TIER_2_GRADE_Value: "B+",
+                TIER_2_GRADE_Civic: "A",
+                TIER_3_GRADE_Pat_Saf: "B+",
+                TIER_3_GRADE_Pat_Exp: "A-",
+                TYPE_HospTyp_CAH: 0,
+                TYPE_HospTyp_ACH: 1,
+                TYPE_urban: 1,
+                TYPE_rural: 0,
+                TYPE_NonProfit: 1,
+                TYPE_ForProfit: 0,
+                TYPE_chrch_affl_f: 0,
+                TYPE_AMC: 1,
+                TYPE_isSafetyNet: 1,
+                HOSPITAL_SYSTEM: 1,
+                Size: "Large",
+                Latitude: 33.7488,
+                Longitude: -84.3877
+            },
+            {
+                RECORD_ID: 2,
+                Name: "Savannah Community Hospital",
+                City: "Savannah",
+                State: "GA",
+                Zip: "31401",
+                TIER_1_GRADE_Lown_Composite: "B+",
+                TIER_2_GRADE_Outcome: "B",
+                TIER_2_GRADE_Value: "A-",
+                TIER_2_GRADE_Civic: "B+",
+                TIER_3_GRADE_Pat_Saf: "A",
+                TIER_3_GRADE_Pat_Exp: "B",
+                TYPE_HospTyp_CAH: 0,
+                TYPE_HospTyp_ACH: 1,
+                TYPE_urban: 1,
+                TYPE_rural: 0,
+                TYPE_NonProfit: 0,
+                TYPE_ForProfit: 1,
+                TYPE_chrch_affl_f: 0,
+                TYPE_AMC: 0,
+                TYPE_isSafetyNet: 0,
+                HOSPITAL_SYSTEM: 1,
+                Size: "Medium",
+                Latitude: 32.0809,
+                Longitude: -81.0912
+            },
+            {
+                RECORD_ID: 3,
+                Name: "Augusta Regional Medical Center",
+                City: "Augusta",
+                State: "GA",
+                Zip: "30901",
+                TIER_1_GRADE_Lown_Composite: "B",
+                TIER_2_GRADE_Outcome: "B-",
+                TIER_2_GRADE_Value: "B",
+                TIER_2_GRADE_Civic: "B+",
+                TIER_3_GRADE_Pat_Saf: "B",
+                TIER_3_GRADE_Pat_Exp: "B+",
+                TYPE_HospTyp_CAH: 1,
+                TYPE_HospTyp_ACH: 0,
+                TYPE_urban: 0,
+                TYPE_rural: 1,
+                TYPE_NonProfit: 1,
+                TYPE_ForProfit: 0,
+                TYPE_chrch_affl_f: 1,
+                TYPE_AMC: 0,
+                TYPE_isSafetyNet: 1,
+                HOSPITAL_SYSTEM: 0,
+                Size: "Small",
+                Latitude: 33.4709,
+                Longitude: -81.9748
+            },
+            {
+                RECORD_ID: 4,
+                Name: "Columbus General Hospital",
+                City: "Columbus",
+                State: "GA",
+                Zip: "31901",
+                TIER_1_GRADE_Lown_Composite: "A-",
+                TIER_2_GRADE_Outcome: "A",
+                TIER_2_GRADE_Value: "B+",
+                TIER_2_GRADE_Civic: "A-",
+                TIER_3_GRADE_Pat_Saf: "A",
+                TIER_3_GRADE_Pat_Exp: "B+",
+                TYPE_HospTyp_CAH: 0,
+                TYPE_HospTyp_ACH: 1,
+                TYPE_urban: 1,
+                TYPE_rural: 0,
+                TYPE_NonProfit: 1,
+                TYPE_ForProfit: 0,
+                TYPE_chrch_affl_f: 0,
+                TYPE_AMC: 1,
+                TYPE_isSafetyNet: 0,
+                HOSPITAL_SYSTEM: 1,
+                Size: "Large",
+                Latitude: 32.4609,
+                Longitude: -84.9877
+            },
+            {
+                RECORD_ID: 5,
+                Name: "Macon Medical Center",
+                City: "Macon",
+                State: "GA",
+                Zip: "31201",
+                TIER_1_GRADE_Lown_Composite: "C+",
+                TIER_2_GRADE_Outcome: "C",
+                TIER_2_GRADE_Value: "B-",
+                TIER_2_GRADE_Civic: "C+",
+                TIER_3_GRADE_Pat_Saf: "B-",
+                TIER_3_GRADE_Pat_Exp: "C",
+                TYPE_HospTyp_CAH: 0,
+                TYPE_HospTyp_ACH: 1,
+                TYPE_urban: 1,
+                TYPE_rural: 0,
+                TYPE_NonProfit: 0,
+                TYPE_ForProfit: 1,
+                TYPE_chrch_affl_f: 0,
+                TYPE_AMC: 0,
+                TYPE_isSafetyNet: 0,
+                HOSPITAL_SYSTEM: 1,
+                Size: "Medium",
+                Latitude: 32.8308,
+                Longitude: -83.6498
+            },
+            {
+                RECORD_ID: 6,
+                Name: "Athens Community Hospital",
+                City: "Athens",
+                State: "GA",
+                Zip: "30601",
+                TIER_1_GRADE_Lown_Composite: "B+",
+                TIER_2_GRADE_Outcome: "B+",
+                TIER_2_GRADE_Value: "A-",
+                TIER_2_GRADE_Civic: "B",
+                TIER_3_GRADE_Pat_Saf: "B+",
+                TIER_3_GRADE_Pat_Exp: "A-",
+                TYPE_HospTyp_CAH: 0,
+                TYPE_HospTyp_ACH: 1,
+                TYPE_urban: 0,
+                TYPE_rural: 1,
+                TYPE_NonProfit: 1,
+                TYPE_ForProfit: 0,
+                TYPE_chrch_affl_f: 0,
+                TYPE_AMC: 1,
+                TYPE_isSafetyNet: 1,
+                HOSPITAL_SYSTEM: 0,
+                Size: "Medium",
+                Latitude: 33.9574,
+                Longitude: -83.3768
+            }
+        ];
+
+        // ===============================
+        // Initialize Application
+        // ===============================
+        document.addEventListener('DOMContentLoaded', function() {
+            hospitalData = sampleHospitalData;
+            filteredHospitalData = [...hospitalData];
+            console.log("Hospital data loaded:", hospitalData.length, "records");
+
+            // Initial render
+            renderHospitals(filteredHospitalData);
+            initHospitalMap(filteredHospitalData);
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        // ===============================
+        // Setup Event Listeners
+        // ===============================
+        function setupEventListeners() {
+            // View Toggle
+            document.getElementById("viewSystemsBtn").addEventListener("click", () => {
+                setViewMode('systems');
+            });
+            
+            document.getElementById("viewIndividualsBtn").addEventListener("click", () => {
+                setViewMode('individuals');
+            });
+
+            // Hospital Type Filter
+            document.getElementById("filterCriticalBtn").addEventListener("click", () => {
+                toggleHospitalType('Critical Access');
+            });
+            
+            document.getElementById("filterAcuteBtn").addEventListener("click", () => {
+                toggleHospitalType('Acute Care');
+            });
+
+            // Location Search
+            document.getElementById("applyLocationBtn").addEventListener("click", applyLocationFilter);
+
+            // Sort Functionality
+            document.getElementById("sortSelect").addEventListener("change", applySorting);
+
+            // Filter Actions
+            document.getElementById("applyFiltersBtn").addEventListener("click", applyAllFilters);
+            document.getElementById("resetFiltersBtn").addEventListener("click", resetAllFilters);
+            document.getElementById("downloadDataBtn").addEventListener("click", downloadData);
+
+            // Enter key for ZIP code
+            document.getElementById("zipInput").addEventListener("keypress", (e) => {
+                if (e.key === 'Enter') {
+                    applyLocationFilter();
+                }
+            });
+        }
+
+        // ===============================
+        // View Mode Logic
+        // ===============================
+        function setViewMode(mode) {
+            currentView = mode;
+            
+            const systemsBtn = document.getElementById("viewSystemsBtn");
+            const individualsBtn = document.getElementById("viewIndividualsBtn");
+            const individualOptions = document.getElementById("individualOptions");
+
+            if (mode === 'systems') {
+                systemsBtn.classList.add("active");
+                individualsBtn.classList.remove("active");
+                individualOptions.style.display = "none";
+            } else {
+                systemsBtn.classList.remove("active");
+                individualsBtn.classList.add("active");
+                individualOptions.style.display = "block";
+            }
+
+            applyAllFilters();
+        }
+
+        // ===============================
+        // Hospital Type Filter Logic
+        // ===============================
+        function toggleHospitalType(type) {
+            const criticalBtn = document.getElementById("filterCriticalBtn");
+            const acuteBtn = document.getElementById("filterAcuteBtn");
+
+            if (currentHospitalType === type) {
+                // Toggle off
+                currentHospitalType = null;
+                criticalBtn.classList.remove("active");
+                acuteBtn.classList.remove("active");
+            } else {
+                // Toggle on
+                currentHospitalType = type;
+                criticalBtn.classList.remove("active");
+                acuteBtn.classList.remove("active");
+                
+                if (type === 'Critical Access') {
+                    criticalBtn.classList.add("active");
+                } else {
+                    acuteBtn.classList.add("active");
+                }
+            }
+
+            applyAllFilters();
+        }
+
+        // ===============================
+        // Location Filter Logic
+        // ===============================
+        function applyLocationFilter() {
+            const zip = document.getElementById("zipInput").value.trim();
+            const radius = parseInt(document.getElementById("radiusSelect").value);
+
+            if (!zip) {
+                // If no ZIP, clear distance calculations
+                filteredHospitalData.forEach(hospital => {
+                    delete hospital.distance;
+                });
+                applyAllFilters();
+                return;
+            }
+
+            // Validate ZIP code
+            if (!/^\d{5}$/.test(zip)) {
+                showErrorPopup("Please enter a valid 5-digit ZIP code");
+                return;
+            }
+
+            console.log(`Applying location filter: ZIP ${zip}, radius ${radius} miles`);
+            
+            // Simulate distance calculation for demo
+            const filtered = hospitalData.filter(hospital => {
+                // Generate random distance for demo (0-50 miles)
+                const randomDistance = Math.random() * 50;
+                hospital.distance = randomDistance;
+                return randomDistance <= radius;
+            });
+
+            filteredHospitalData = filtered;
+            applySorting();
+        }
+
+        // ===============================
+        // Checkbox Filter Logic
+        // ===============================
+        function getSelectedFilters() {
+            const filters = {
+                hospitalTypes: [],
+                metricCategories: []
+            };
+
+            // Get hospital type filters
+            document.querySelectorAll('details:first-of-type input[type="checkbox"]:checked').forEach(checkbox => {
+                filters.hospitalTypes.push(checkbox.value);
+            });
+
+            // Get metric category filters
+            document.querySelectorAll('details:last-of-type input[type="checkbox"]:checked').forEach(checkbox => {
+                filters.metricCategories.push(checkbox.value);
+            });
+
+            return filters;
+        }
+
+        // ===============================
+        // Main Filter Logic
+        // ===============================
+        function applyAllFilters() {
+            let filtered = [...hospitalData];
+            const filters = getSelectedFilters();
+
+            // Apply view mode filter
+            if (currentView === 'systems') {
+                filtered = filtered.filter(hospital => hospital.HOSPITAL_SYSTEM === 1);
+            }
+
+            // Apply hospital type filter
+            if (currentHospitalType === 'Critical Access') {
+                filtered = filtered.filter(hospital => hospital.TYPE_HospTyp_CAH === 1);
+            } else if (currentHospitalType === 'Acute Care') {
+                filtered = filtered.filter(hospital => hospital.TYPE_HospTyp_ACH === 1);
+            }
+
+            // Apply hospital type checkbox filters
+            if (filters.hospitalTypes.length > 0) {
+                filtered = filtered.filter(hospital => {
+                    return filters.hospitalTypes.some(filter => {
+                        switch(filter) {
+                            case 'Urban':
+                                return hospital.TYPE_urban === 1;
+                            case 'Rural':
+                                return hospital.TYPE_rural === 1;
+                            case 'Non-profit':
+                                return hospital.TYPE_NonProfit === 1;
+                            case 'For Profit':
+                                return hospital.TYPE_ForProfit === 1;
+                            case 'Church Affiliated':
+                                return hospital.TYPE_chrch_affl_f === 1;
+                            case 'Academic Medical Center':
+                                return hospital.TYPE_AMC === 1;
+                            case 'Safety Net':
+                                return hospital.TYPE_isSafetyNet === 1;
+                            default:
+                                return true;
+                        }
+                    });
+                });
+            }
+
+            // Apply metric category filters
+            if (filters.metricCategories.length > 0) {
+                filtered = filtered.filter(hospital => {
+                    return filters.metricCategories.some(category => {
+                        return hasMetricData(hospital, category);
+                    });
+                });
+            }
+
+            filteredHospitalData = filtered;
+            applySorting();
+        }
+
+        function hasMetricData(hospital, category) {
+            // Map category names to actual data fields in your JSON
+            const categoryMap = {
+                'Financial Transparency and Institutional Health': [
+                    'TIER_2_GRADE_Value', 'Financial_Transparency'
+                ],
+                'Community Benefit Spending': [
+                    'TIER_3_GRADE_CB', 'Community_Benefit'
+                ],
+                'Healthcare Affordability and Billing': [
+                    'TIER_3_GRADE_Cost_Eff', 'Affordability'
+                ],
+                'Healthcare Access and Social Responsibility': [
+                    'TIER_3_GRADE_Inclusivity', 'Access_Care'
+                ]
+            };
+
+            const fields = categoryMap[category] || [];
+            return fields.some(field => {
+                const value = hospital[field];
+                return value !== undefined && value !== null && value !== '' && value !== 'N/A';
+            });
+        }
+
+        // ===============================
+        // Sorting Logic
+        // ===============================
+        function applySorting() {
+            const sortValue = document.getElementById("sortSelect").value;
+            let sorted = [...filteredHospitalData];
+
+            switch(sortValue) {
+                case "grade":
+                    sorted.sort((a, b) => {
+                        const gradeOrder = { 'A+': 12, 'A': 11, 'A-': 10, 'B+': 9, 'B': 8, 'B-': 7, 'C+': 6, 'C': 5, 'C-': 4, 'D+': 3, 'D': 2, 'D-': 1, 'F': 0 };
+                        const gradeA = a.TIER_1_GRADE_Lown_Composite || 'F';
+                        const gradeB = b.TIER_1_GRADE_Lown_Composite || 'F';
+                        return (gradeOrder[gradeB] || 0) - (gradeOrder[gradeA] || 0);
+                    });
+                    break;
+                    
+                case "distance":
+                    sorted.sort((a, b) => {
+                        const distA = a.distance || Infinity;
+                        const distB = b.distance || Infinity;
+                        return distA - distB;
+                    });
+                    break;
+                    
+                case "name":
+                    sorted.sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+                    break;
+                    
+                case "size":
+                    const sizeOrder = { 'xs': 0, 's': 1, 'm': 2, 'l': 3, 'xl': 4 };
+                    sorted.sort((a, b) => {
+                        const sizeA = sizeOrder[a.Size?.toLowerCase()] ?? -1;
+                        const sizeB = sizeOrder[b.Size?.toLowerCase()] ?? -1;
+                        return sizeA - sizeB;
+                    });
+                    break;
+            }
+
+            renderHospitals(sorted);
+            initHospitalMap(sorted);
+        }
+
+        // ===============================
+        // Reset Logic
+        // ===============================
+        function resetAllFilters() {
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Reset location
+            document.getElementById("zipInput").value = "";
+            document.getElementById("radiusSelect").selectedIndex = 0;
+            
+            // Reset view mode
+            setViewMode('individuals');
+            
+            // Reset hospital type
+            currentHospitalType = null;
+            document.getElementById("filterCriticalBtn").classList.remove("active");
+            document.getElementById("filterAcuteBtn").classList.remove("active");
+            
+            // Reset sort
+            document.getElementById("sortSelect").selectedIndex = 0;
+            
+            // Reset data
+            filteredHospitalData = [...hospitalData];
+            
+            // Re-render
+            renderHospitals(filteredHospitalData);
+            initHospitalMap(filteredHospitalData);
+            
+            console.log("All filters reset");
+            showErrorPopup("All filters have been reset");
+        }
+
+        // ===============================
+        // Download Logic
+        // ===============================
+        function downloadData() {
+            if (filteredHospitalData.length === 0) {
+                showErrorPopup("No data available to download");
+                return;
+            }
+
+            console.log("Download triggered");
+            
+            // Convert data to CSV
+            const csv = convertToCSV(filteredHospitalData);
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `georgia-hospitals-${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            // Get all unique keys from all objects
+            const headers = new Set();
+            data.forEach(item => {
+                Object.keys(item).forEach(key => headers.add(key));
+            });
+            
+            const headerArray = Array.from(headers);
+            const csvRows = [headerArray.join(',')];
+            
+            data.forEach(row => {
+                const values = headerArray.map(header => {
+                    const value = row[header];
+                    if (value === null || value === undefined) return '""';
+                    const escaped = String(value).replace(/"/g, '""');
+                    return `"${escaped}"`;
+                });
+                csvRows.push(values.join(','));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        // ===============================
+        // Render Hospitals
+        // ===============================
+        function renderHospitals(data) {
+            const resultsTable = document.getElementById("hospitalResults");
+            const resultsCount = document.getElementById("resultsCount");
+
+            // Clear old results
+            resultsTable.innerHTML = "";
+
+            // Update results count
+            const resultText = data.length === 1 ? "result" : "results";
+            resultsCount.textContent = `Viewing ${data.length} ${resultText}`;
+
+            if (!data.length) {
+                resultsTable.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 40px; color: #666;">No hospitals match the selected filters. Try adjusting your criteria.</td></tr>`;
+                return;
+            }
+
+            data.forEach(hospital => {
+                const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+                const stars = convertGradeToStars(grade);
+
+                // Main Row
+                const row = document.createElement("tr");
+                row.classList.add("hospital-row");
+
+                const gradeCell = document.createElement("td");
+                gradeCell.innerHTML = `
+                    <div class="star-rating" aria-label="${stars.value} out of 5 stars">
+                        ${renderStars(stars.value)}
+                        <span class="grade-text">${grade}</span>
+                    </div>
+                `;
+                row.appendChild(gradeCell);
+
+                const nameCell = document.createElement("td");
+                nameCell.innerHTML = `
+                    <strong>
+                        <a href="#" class="hospital-link" onclick="showHospitalDetails(${hospital.RECORD_ID})">
+                            ${hospital.Name || "Unnamed Hospital"}
+                        </a>
+                    </strong><br>
+                    <span class="hospital-location">${hospital.City || ""}, ${hospital.State || ""}</span>
+                    ${hospital.distance ? `<br><small class="distance">Distance: ${hospital.distance.toFixed(1)} miles</small>` : ''}
+                    ${hospital.Size ? `<br><small class="hospital-size">Size: ${hospital.Size}</small>` : ''}
+                `;
+                row.appendChild(nameCell);
+
+                // Buttons
+                const buttonCell = document.createElement("td");
+                buttonCell.classList.add("details-buttons");
+
+                const detailsButton = document.createElement("button");
+                detailsButton.textContent = "View Details ▼";
+                detailsButton.classList.add("toggle-detail");
+
+                const fullDetailsButton = document.createElement("button");
+                fullDetailsButton.textContent = "View Full Details";
+                fullDetailsButton.classList.add("view-full-detail");
+                fullDetailsButton.addEventListener("click", () => {
+                    showHospitalDetails(hospital.RECORD_ID);
+                });
+
+                buttonCell.appendChild(detailsButton);
+                buttonCell.appendChild(fullDetailsButton);
+                row.appendChild(buttonCell);
+
+                // Detail Row (collapsed preview)
+                const detailRow = document.createElement("tr");
+                detailRow.classList.add("hospital-detail-row");
+                detailRow.style.display = "none";
+
+                const detailCell = document.createElement("td");
+                detailCell.colSpan = 3;
+                detailCell.innerHTML = `
+                    <div class="detail-info">
+                        <div class="detail-metrics">
+                            <p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
+                            <p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
+                            <p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
+                            <p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
+                            <p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
+                        </div>
+                    </div>
+                `;
+                detailRow.appendChild(detailCell);
+
+                // Toggle Logic
+                detailsButton.addEventListener("click", () => {
+                    const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
+                    detailRow.style.display = isHidden ? "table-row" : "none";
+                    detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
+                });
+
+                // Append both rows
+                resultsTable.appendChild(row);
+                resultsTable.appendChild(detailRow);
+            });
+        }
+
+        // ===============================
+        // Map Functions
+        // ===============================
+        function initHospitalMap(data) {
+            const mapDiv = document.getElementById("mainMap");
+            if (!mapDiv) return;
+
+            // Initialize only once
+            if (!map) {
+                map = L.map("mainMap").setView([32.7, -83.4], 7);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(map);
+            }
+
+            // Clear old markers
+            mapMarkers.forEach(marker => map.removeLayer(marker));
+            mapMarkers = [];
+
+            // Add new markers
+            data.forEach(hospital => {
+                let lat = parseFloat(hospital.Latitude) || parseFloat(hospital.LAT) || parseFloat(hospital.lat);
+                let lon = parseFloat(hospital.Longitude) || parseFloat(hospital.LON) || parseFloat(hospital.lon);
+
+                // If no coordinates, approximate from ZIP code
+                if ((!lat || !lon) && hospital.Zip) {
+                    [lat, lon] = getZipCoords(hospital.Zip);
+                }
+                if (!lat || !lon) return;
+
+                const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+                const stars = convertGradeToStars(grade);
+
+                const popupHTML = `
+                    <div class="map-popup">
+                        <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+                        ${hospital.City || ""}, ${hospital.State || ""}<br>
+                        <div class="star-rating">${renderStars(stars.value)}</div>
+                        <div class="popup-grade">Grade: ${grade}</div>
+                        <a href="#" onclick="showHospitalDetails(${hospital.RECORD_ID})" class="view-full-detail">
+                            View Full Details
+                        </a>
+                    </div>
+                `;
+
+                const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+                mapMarkers.push(marker);
+            });
+
+            // Adjust map to fit all visible markers
+            if (mapMarkers.length > 0) {
+                const group = L.featureGroup(mapMarkers);
+                map.fitBounds(group.getBounds().pad(0.2));
+            } else {
+                // Reset to Georgia default if no markers
+                map.setView([32.1656, -82.9001], 7);
+            }
+            
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 200);
+        }
+
+        function getZipCoords(zip) {
+            const lookup = {
+                "30303": [33.7525, -84.3915], // Atlanta
+                "30720": [34.7698, -84.9719], // Dalton
+                "31201": [32.8306, -83.6513], // Macon
+                "31901": [32.464, -84.9877],  // Columbus
+                "31401": [32.0809, -81.0912], // Savannah
+                "31520": [31.1499, -81.4915], // Brunswick
+                "31701": [31.5795, -84.1557], // Albany
+                "39817": [30.9043, -84.5762], // Bainbridge
+                "30601": [33.959, -83.3767],  // Athens
+                "30161": [34.2546, -85.1647], // Rome
+            };
+
+            const coords = lookup[String(zip)] || [32.5, -83.5];
+            return coords;
+        }
+
+        // ===============================
+        // Hospital Details Modal
+        // ===============================
+        function showHospitalDetails(hospitalId) {
+            const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
+            if (!hospital) return;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+            `;
+
+            const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+            const stars = convertGradeToStars(grade);
+
+            modalContent.innerHTML = `
+                <button onclick="this.closest('div').remove()" style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">×</button>
+                <h2 style="color: #6fb353; margin-bottom: 20px;">${hospital.Name}</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="color: #6fb353; margin-bottom: 10px;">Hospital Information</h3>
+                        <p><strong>Location:</strong> ${hospital.City}, ${hospital.State}</p>
+                        <p><strong>Type:</strong> ${hospital.TYPE_NonProfit ? 'Nonprofit' : 'For Profit'}</p>
+                        <p><strong>Setting:</strong> ${hospital.TYPE_urban ? 'Urban' : 'Rural'}</p>
+                        <p><strong>Size:</strong> ${hospital.Size}</p>
+                    </div>
+                    <div>
+                        <h3 style="color: #6fb353; margin-bottom: 10px;">Overall Grade</h3>
+                        <div class="star-rating">${renderStars(stars.value)}</div>
+                        <p style="font-weight: bold; margin-top: 5px;">${grade}</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color: #6fb353; margin-bottom: 10px;">Performance Metrics</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <p><strong>Outcome:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
+                        <p><strong>Value:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
+                        <p><strong>Civic:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
+                        <p><strong>Safety:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
+                        <p><strong>Experience:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
+                    </div>
+                </div>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // ===============================
+        // Star Rating Utilities
+        // ===============================
+        function convertGradeToStars(grade) {
+            const gradeMap = {
+                "A+": 5, "A": 5, "A-": 4.5,
+                "B+": 4.5, "B": 4, "B-": 3.5,
+                "C+": 3.5, "C": 3, "C-": 2.5,
+                "D+": 2.5, "D": 2, "D-": 1.5,
+                "F": 1,
+            };
+            const value = gradeMap[grade.trim()] || 0;
+            return { value };
+        }
+
+        function renderStars(value) {
+            let html = "";
+            for (let i = 1; i <= 5; i++) {
+                if (value >= i) {
+                    html += fullStarSVG();
+                } else if (value >= i - 0.5) {
+                    html += halfStarSVG();
+                } else {
+                    html += emptyStarSVG();
+                }
+            }
+            return html;
+        }
+
+        function fullStarSVG() {
+            return `
+                <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+                </svg>
+            `;
+        }
+
+        function halfStarSVG() {
+            return `
+                <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="halfGradient" x1="0" x2="1">
+                            <stop offset="50%" stop-color="#f48810" />
+                            <stop offset="50%" stop-color="#a4cc95" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+                </svg>
+            `;
+        }
+
+        function emptyStarSVG() {
+            return `
+                <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+                </svg>
+            `;
+        }
+
+        // ===============================
+        // Error Popup Utility
+        // ===============================
+        function showErrorPopup(message) {
+            // Remove existing popup if any
+            const existingPopup = document.querySelector('.error-popup');
+            if (existingPopup) existingPopup.remove();
+
+            const popup = document.createElement("div");
+            popup.className = "error-popup";
+            popup.innerHTML = `<p>${message}</p>`;
+            document.body.appendChild(popup);
+
+            // Animate fade-in
+            setTimeout(() => popup.classList.add("visible"), 10);
+
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                popup.classList.remove("visible");
+                setTimeout(() => {
+                    if (popup.parentNode) popup.remove();
+                }, 400);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
