@@ -2,6 +2,11 @@
 // Data Storage
 // ===============================
 let hospitalData = [];
+let filteredHospitalData = [];
+let currentView = 'individuals'; // 'systems' or 'individuals'
+let currentHospitalType = null; // 'Critical Access' or 'Acute Care'
+let map;
+let mapMarkers = [];
 
 // ===============================
 // Load JSON Data
