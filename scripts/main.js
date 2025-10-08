@@ -3,10 +3,6 @@
 // ===============================
 let hospitalData = [];
 let filteredHospitalData = [];
-let currentView = 'individuals'; // 'systems' or 'individuals'
-let currentHospitalType = null; // 'Critical Access' or 'Acute Care'
-let map;
-let mapMarkers = [];
 
 // ===============================
 // Load JSON Data
@@ -15,12 +11,12 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
+    filteredHospitalData = [...hospitalData];
     console.log("Hospital data loaded:", hospitalData.length, "records");
 
     // Initial render
-    renderHospitals(hospitalData);
-	initHospitalMap(hospitalData);
-
+    renderHospitals(filteredHospitalData);
+    initHospitalMap(filteredHospitalData);
   })
   .catch(err => console.error("Error loading JSON:", err));
 
@@ -101,17 +97,17 @@ function renderHospitals(data) {
     const detailCell = document.createElement("td");
     detailCell.colSpan = 3;
     detailCell.innerHTML = `
-	  <div class="detail-info">
-		<p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
-		<p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
-		<p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
-		<p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
-		<p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
-	  </div>
-	`;
+      <div class="detail-info">
+        <p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
+        <p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
+        <p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
+        <p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
+        <p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
+      </div>
+    `;
     detailRow.appendChild(detailCell);
 
-    // === Toggle Logic (single listener) ===
+    // === Toggle Logic ===
     detailsButton.addEventListener("click", () => {
       const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
       detailRow.style.display = isHidden ? "table-row" : "none";
@@ -124,73 +120,9 @@ function renderHospitals(data) {
   });
 }
 
-
-function toggleHospitalDetails(hospitalId, button) {
-  const existingRow = document.querySelector(`.details-row[data-id="${hospitalId}"]`);
-  if (existingRow) {
-    existingRow.remove(); // close if already open
-    return;
-  }
-
-  const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
-  if (!hospital) {
-    console.error("Hospital not found:", hospitalId);
-    return;
-  }
-
-  const detailsRow = document.createElement("tr");
-  detailsRow.classList.add("details-row");
-  detailsRow.setAttribute("data-id", hospitalId);
-
-  detailsRow.innerHTML = `
-    <td colspan="3">
-      <div class="hospital-details-dropdown show">
-        <div class="details-grid">
-          ${renderGrades(hospital)}
-        </div>
-      </div>
-    </td>
-  `;
-
-  const currentRow = button.closest("tr");
-  currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
-}
-
-
-function renderGrades(hospital) {
-  const metrics = [
-    { key: "TIER_1_GRADE_Lown_Composite", label: "Tier 1 Composite" },
-    { key: "TIER_2_GRADE_Outcome", label: "Tier 2 Outcome" },
-    { key: "TIER_2_GRADE_Value", label: "Tier 2 Value" },
-    { key: "TIER_2_GRADE_Civic", label: "Tier 2 Civic" },
-    { key: "TIER_3_GRADE_Outcome", label: "Tier 3 Outcome" },
-    { key: "TIER_3_GRADE_Pat_Saf", label: "Tier 3 Patient Safety" },
-    { key: "TIER_3_GRADE_Pat_Exp", label: "Tier 3 Patient Experience" },
-    { key: "TIER_3_GRADE_OU", label: "Tier 3 Overuse" },
-    { key: "TIER_3_GRADE_Cost_Eff", label: "Tier 3 Cost Efficiency" },
-    { key: "TIER_3_GRADE_Exec_Comp", label: "Tier 3 Exec Comp" },
-    { key: "TIER_3_GRADE_CB", label: "Tier 3 Community Benefit" },
-    { key: "TIER_3_GRADE_Inclusivity", label: "Tier 3 Inclusivity" }
-  ];
-
-  return metrics.map(m => {
-	  const grade = hospital[m.key] || "N/A";
-	  const stars = convertGradeToStars(grade);
-	  return `
-		<div class="details-section">
-		  <h4>${m.label}</h4>
-		  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
-			${renderStars(stars.value)}
-			<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
-		  </div>
-		</div>
-	  `;
-	}).join("");
-
-}
-
-
-
+// ===============================
+// View Toggle Functionality
+// ===============================
 const viewSystemsBtn = document.getElementById("viewSystemsBtn");
 const viewIndividualsBtn = document.getElementById("viewIndividualsBtn");
 const individualOptions = document.getElementById("individualOptions");
@@ -206,25 +138,21 @@ function deactivateHospitalTypeButtons() {
 // Critical Access toggle
 filterCriticalBtn.addEventListener("click", () => {
   const isActive = filterCriticalBtn.classList.contains("active");
-
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterCriticalBtn.classList.add("active");
   }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+  applyFilters();
 });
 
 // Acute Care toggle
 filterAcuteBtn.addEventListener("click", () => {
   const isActive = filterAcuteBtn.classList.contains("active");
-
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterAcuteBtn.classList.add("active");
   }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+  applyFilters();
 });
 
 // Helper function to get current selection
@@ -238,20 +166,21 @@ viewSystemsBtn.addEventListener("click", () => {
   viewSystemsBtn.classList.add("active");
   viewIndividualsBtn.classList.remove("active");
   individualOptions.style.display = "none";
-
-  console.log("View set to: Hospital Systems");
-  // TODO: Implement system-level rendering
-  renderHospitals(hospitalData); // placeholder
+  applyFilters();
 });
 
 viewIndividualsBtn.addEventListener("click", () => {
   viewIndividualsBtn.classList.add("active");
   viewSystemsBtn.classList.remove("active");
   individualOptions.style.display = "block";
+  applyFilters();
+});
 
-  console.log("View set to: Individual Hospitals");
-  // TODO: Implement individual rendering with critical/acute filtering
-  renderHospitals(hospitalData); // placeholder
+// ===============================
+// Sorting Functionality
+// ===============================
+document.getElementById("sortSelect").addEventListener("change", function() {
+  sortAndRender(filteredHospitalData);
 });
 
 function sortAndRender(data) {
@@ -263,18 +192,17 @@ function sortAndRender(data) {
     sorted.sort((a, b) => {
       const gradeA = a.TIER_1_GRADE_Lown_Composite || "F";
       const gradeB = b.TIER_1_GRADE_Lown_Composite || "F";
-      return gradeA.localeCompare(gradeB); // or reverse it if needed
+      return gradeB.localeCompare(gradeA); // High to Low
     });
   } else if (sortValue === "distance") {
+    // This would require ZIP code distance calculation
     sorted.sort((a, b) => {
-      return (a.distance || 99999) - (b.distance || 99999); // assumes `.distance` was set by ZIP logic
+      return (a.distance || 99999) - (b.distance || 99999);
     });
   } else if (sortValue === "name") {
     sorted.sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
-  }
-    else if (sortValue === "size") {
+  } else if (sortValue === "size") {
     const sizeOrder = ["Small", "Medium", "Large", "Extra Large"];
-
     sorted.sort((a, b) => {
       const sizeA = a.Size || "";
       const sizeB = b.Size || "";
@@ -284,43 +212,82 @@ function sortAndRender(data) {
     });
   }
 
-
   renderHospitals(sorted);
+  initHospitalMap(sorted);
 }
 
 // ===============================
-// Apply Filters
+// Filtering Functionality
 // ===============================
-document.getElementById("applyFiltersBtn").addEventListener("click", () => {
+function applyFilters() {
   const zip = document.getElementById("zipInput").value.trim();
-  const radius = document.getElementById("radiusSelect").value;
-  const checked = [...document.querySelectorAll("input[type='checkbox']:checked")].map(cb => cb.value);
+  const checkedTypes = [...document.querySelectorAll("input[type='checkbox']:checked")].map(cb => cb.value);
+  
+  let filtered = hospitalData.filter(hospital => {
+    // Hospital type filtering
+    let typeMatch = true;
+    if (checkedTypes.length > 0) {
+      typeMatch = checkedTypes.some(type => {
+        const typeLower = type.toLowerCase();
+        if (typeLower.includes("urban")) return hospital.TYPE_urban;
+        if (typeLower.includes("rural")) return hospital.TYPE_rural;
+        if (typeLower.includes("non-profit")) return hospital.TYPE_NonProfit;
+        if (typeLower.includes("for profit")) return hospital.TYPE_ForProfit;
+        if (typeLower.includes("church")) return hospital.TYPE_chrch_affl_f;
+        if (typeLower.includes("academic")) return hospital.TYPE_AMC;
+        if (typeLower.includes("safety")) return hospital.TYPE_isSafetyNet;
+        return false;
+      });
+    }
 
-  console.log("ZIP:", zip, "Radius:", radius);
-  console.log("Selected Filters:", checked);
+    // Individual hospital type filtering
+    const selectedType = getSelectedHospitalType();
+    let individualTypeMatch = true;
+    if (selectedType === "Critical Access") {
+      individualTypeMatch = hospital.TYPE_HospTyp_CAH;
+    } else if (selectedType === "Acute Care") {
+      individualTypeMatch = hospital.TYPE_HospTyp_ACH;
+    }
 
-  // TODO: Real filtering logic (hook into fields in JSON)
-  let filtered = hospitalData.filter(h => {
-    return checked.every(val =>
-      JSON.stringify(h).toLowerCase().includes(val.toLowerCase())
-    );
+    return typeMatch && individualTypeMatch;
   });
 
-  renderHospitals(filtered);
-  initHospitalMap(filtered);
+  filteredHospitalData = filtered;
+  sortAndRender(filteredHospitalData);
+}
 
-});
+// Apply Filters Button
+document.getElementById("applyFiltersBtn").addEventListener("click", applyFilters);
+
+// Apply Location Button
+document.getElementById("applyLocationBtn").addEventListener("click", applyFilters);
 
 // ===============================
 // Reset Filters
 // ===============================
 document.getElementById("resetFiltersBtn").addEventListener("click", () => {
+  // Reset all checkboxes
   document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+  
+  // Reset ZIP input
   document.getElementById("zipInput").value = "";
+  
+  // Reset radius select
   document.getElementById("radiusSelect").selectedIndex = 0;
+  
+  // Reset view toggles
+  viewSystemsBtn.classList.remove("active");
+  viewIndividualsBtn.classList.remove("active");
+  individualOptions.style.display = "none";
+  deactivateHospitalTypeButtons();
+  
+  // Reset sort
+  document.getElementById("sortSelect").selectedIndex = 0;
+  
   console.log("Filters reset");
-
-  renderHospitals(hospitalData);
+  filteredHospitalData = [...hospitalData];
+  renderHospitals(filteredHospitalData);
+  initHospitalMap(filteredHospitalData);
 });
 
 // ===============================
@@ -328,64 +295,21 @@ document.getElementById("resetFiltersBtn").addEventListener("click", () => {
 // ===============================
 document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
-  // TODO: backend or SheetJS export
+  // TODO: Implement download functionality
 });
-
-function showHospitalDetailPage(hospitalId) {
-    document.querySelector('.main-content').style.display = 'none';
-    document.querySelector('.map-section').style.display = 'none';
-
-    const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
-
-    if (!hospital) {
-        window.location.href = window.location.pathname;
-        return;
-    }
-
-    const detailContainer = document.createElement('div');
-    detailContainer.className = 'hospital-detail-container';
-
-    const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
-
-    const lat = 32.6782 + (Math.random() - 0.5) * 2;
-    const lng = -83.2226 + (Math.random() - 0.5) * 2;
-
-    detailContainer.innerHTML = `
-        <div class="hospital-header">
-            <h2>${hospital.HOSPITAL_NAME}</h2>
-            <span class="hospital-grade ${gradeClass}">${hospital.TIER_1_GRADE_Lown_Composite}</span>
-        </div>
-        <p><strong>Location:</strong> ${hospital.CITY}, ${hospital.STATE}</p>
-        <p><strong>Type:</strong> ${hospital.HOSPITAL_TYPE}</p>
-        <p><strong>Ownership:</strong> ${hospital.OWNERSHIP}</p>
-        <p><strong>System Name:</strong> ${hospital.SYSTEM_NAME}</p>
-        <p><strong>Zip Code:</strong> ${hospital.ZIP_CODE}</p>
-        <button onclick="window.location.reload()">Back to Results</button>
-    `;
-
-    document.body.appendChild(detailContainer);
-}
 
 // ===============================
 // Star Rating Utilities
 // ===============================
 function convertGradeToStars(grade) {
   const gradeMap = {
-    "A+": 5,
-    "A": 5,
-    "A-": 4.5,
-    "B+": 4.5,
-    "B": 4,
-    "B-": 3.5,
-    "C+": 3.5,
-    "C": 3,
-    "C-": 2.5,
-    "D+": 2.5,
-    "D": 2,
-    "D-": 1.5,
+    "A+": 5, "A": 5, "A-": 4.5,
+    "B+": 4.5, "B": 4, "B-": 3.5,
+    "C+": 3.5, "C": 3, "C-": 2.5,
+    "D+": 2.5, "D": 2, "D-": 1.5,
     "F": 1,
   };
-  const value = gradeMap[grade.trim()] || 0;
+  const value = gradeMap[grade?.trim()] || 0;
   return { value };
 }
 
@@ -404,67 +328,53 @@ function renderStars(value) {
 }
 
 function fullStarSVG() {
-  return `
-    <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
+  return `<svg class="star full" viewBox="0 0 24 24" width="20" height="20">
+    <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+  </svg>`;
 }
 
 function halfStarSVG() {
-  return `
-    <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <linearGradient id="halfGradient" x1="0" x2="1">
-          <stop offset="50%" stop-color="#f48810" />
-          <stop offset="50%" stop-color="#a4cc95" />
-        </linearGradient>
-      </defs>
-      <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
+  return `<svg class="star half" viewBox="0 0 24 24" width="20" height="20">
+    <defs><linearGradient id="halfGradient" x1="0" x2="1">
+      <stop offset="50%" stop-color="#f48810"/><stop offset="50%" stop-color="#a4cc95"/>
+    </linearGradient></defs>
+    <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+  </svg>`;
 }
 
 function emptyStarSVG() {
-  return `
-    <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
+  return `<svg class="star empty" viewBox="0 0 24 24" width="20" height="20">
+    <path fill="#ddd" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+  </svg>`;
 }
 
 // ===============================
 // Leaflet Map Integration
 // ===============================
-let map; // Global map instance so we can reuse it
-let mapMarkers = []; // Store current markers to clear them later
+let map;
+let mapMarkers = [];
 
-// ===============================
-// ZIP-Based Coordinate Approximation (for hospitals without lat/lon)
-// ===============================
 function getZipCoords(zip) {
-  const baseLat = 31.0;   // southern edge of Georgia
-  const baseLon = -85.5;  // western edge of Georgia
-  const zipNum = parseInt(String(zip).replace(/\D/g, "")) || 30000;
-
-  // Spread zip codes somewhat evenly across the state
-  const offsetLat = ((zipNum % 300) / 100) * 0.8; // 0–2.4° northward variation
-  const offsetLon = ((zipNum % 700) / 100) * 0.8; // 0–2.4° eastward variation
-
-  return [baseLat + offsetLat, baseLon + offsetLon];
+  const lookup = {
+    "30303": [33.7525, -84.3915], "30720": [34.7698, -84.9719],
+    "31201": [32.8306, -83.6513], "31901": [32.464, -84.9877],
+    "31401": [32.0809, -81.0912], "31520": [31.1499, -81.4915],
+    "31701": [31.5795, -84.1557], "39817": [30.9043, -84.5762],
+    "30601": [33.959, -83.3767], "30161": [34.2546, -85.1647],
+  };
+  return lookup[String(zip)] || [32.5, -83.5];
 }
 
 function initHospitalMap(data) {
   const mapDiv = document.getElementById("mainMap");
   if (!mapDiv) return;
 
-  // Initialize only once
-	if (!map) {
-	  map = L.map("mainMap").setView([32.7, -83.4], 7); // centered around Georgia
-	  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-		attribution: "&copy; OpenStreetMap contributors"
-	  }).addTo(map);
-	}
+  if (!map) {
+    map = L.map("mainMap").setView([32.7, -83.4], 7);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+  }
 
   // Clear old markers
   mapMarkers.forEach(marker => map.removeLayer(marker));
@@ -472,30 +382,20 @@ function initHospitalMap(data) {
 
   // Add new markers
   data.forEach(hospital => {
-    // Try all common latitude/longitude field names
-	let lat =
-	  parseFloat(hospital.Latitude) ||
-	  parseFloat(hospital.LAT) ||
-	  parseFloat(hospital.lat) ||
-	  parseFloat(hospital.latitude);
-	let lon =
-	  parseFloat(hospital.Longitude) ||
-	  parseFloat(hospital.LON) ||
-	  parseFloat(hospital.lon) ||
-	  parseFloat(hospital.longitude);
+    let lat = parseFloat(hospital.Latitude) || parseFloat(hospital.LAT) || parseFloat(hospital.lat);
+    let lon = parseFloat(hospital.Longitude) || parseFloat(hospital.LON) || parseFloat(hospital.lon);
 
-	// If no coordinates, approximate from ZIP code
-	if ((!lat || !lon) && hospital.Zip) {
-	  [lat, lon] = getZipCoords(hospital.Zip);
-	}
-	if (!lat || !lon) return; // Skip entries missing coordinates
+    if ((!lat || !lon) && hospital.Zip) {
+      [lat, lon] = getZipCoords(hospital.Zip);
+    }
+    if (!lat || !lon) return;
 
     const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
     const stars = convertGradeToStars(grade);
 
     const popupHTML = `
-      <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
-      ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
+      <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+      ${hospital.City || ""}, ${hospital.State || ""}<br>
       <div class="star-rating">${renderStars(stars.value)}</div>
       <a href="details.html?id=${hospital.RECORD_ID}" target="_blank" class="view-full-detail">
         View Full Details
@@ -506,18 +406,16 @@ function initHospitalMap(data) {
     mapMarkers.push(marker);
   });
 
-  // Adjust map to fit all visible markers
   if (mapMarkers.length > 0) {
     const group = L.featureGroup(mapMarkers);
     map.fitBounds(group.getBounds().pad(0.2));
   } else {
-    // Reset to Georgia default if no markers
     map.setView([32.1656, -82.9001], 7);
   }
   
   setTimeout(() => {
-  map.invalidateSize();
-	}, 200);
+    map.invalidateSize();
+  }, 200);
 }
 
 // ===============================
@@ -529,12 +427,32 @@ function showErrorPopup(message) {
   popup.innerHTML = `<p>${message}</p>`;
   document.body.appendChild(popup);
 
-  // Animate fade-in
   setTimeout(() => popup.classList.add("visible"), 10);
 
-  // Auto-remove after 4 seconds
   setTimeout(() => {
     popup.classList.remove("visible");
     setTimeout(() => popup.remove(), 400);
   }, 4000);
 }
+
+// Add some basic CSS for the error popup
+const errorPopupStyles = document.createElement('style');
+errorPopupStyles.textContent = `
+  .error-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e74c3c;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .error-popup.visible {
+    transform: translateX(0);
+  }
+`;
+document.head.appendChild(errorPopupStyles);
