@@ -27,7 +27,7 @@ body {
    Header
 =============================== */
 header {
-  background: linear-gradient(#6fb353, #5a9445);
+  background: linear-gradient(#6fb353);
   color: white;
   padding: 8px 0;
   position: relative;
@@ -136,6 +136,18 @@ header {
   overflow: visible;
 }
 
+/* ===============================
+   Map Column — scrolls naturally
+=============================== */
+.map-section h2 {
+  background-color: #6fb353;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
 /* =========================================
    FIX — Index Page Map Behavior (Safe Scoped)
 ========================================= */
@@ -159,10 +171,11 @@ header {
 
 .index-page #mainMap {
   width: 100%;
-  height: 500px !important;
+  height: 500px !important;  /* fixed visible height */
   flex: none !important;
   display: block;
 }
+
 
 /* ===============================
    Sidebar
@@ -449,7 +462,7 @@ header {
    Footer
 =============================== */
 footer {
-  background: linear-gradient(#6fb353, #5a9445);
+  background: linear-gradient(#6fb353);
   color: white;
   padding: 30px 0;
   margin-top: 40px;
@@ -576,7 +589,7 @@ footer {
 }
 
 .detail-topbar .spacer {
-  width: 110px;
+  width: 110px; /* roughly the same width as the back button */
 }
 
 .detail-hero-wrap {
@@ -661,7 +674,7 @@ footer {
 
 .services-grid li::before {
   content: "✔";
-  color: #6fb353;
+  color: #6fb353; /* your green */
   font-weight: bold;
   font-size: 0.85em;
 }
@@ -669,6 +682,7 @@ footer {
 .services-grid li:hover {
   background-color: #f4fff7;
 }
+
 
 /* ===== Metrics ===== */
 .metrics-wrap {
@@ -691,7 +705,7 @@ footer {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: #6fb353;
+  background: #6fb353; /* sponsor green */
   color: #ffffff;
   border-bottom: none;
 }
@@ -704,7 +718,7 @@ footer {
 }
 
 .metric-header .star-rating svg {
-  fill: #f48810;
+  fill: #f48810; /* orange stars */
 }
 
 .submetric {
@@ -904,7 +918,7 @@ footer {
 
 /* Add space between accordion sections */
 .index-page .sidebar details {
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* space between each filter section */
   border: 1px solid #cde3c7;
   border-radius: 6px;
   background: #fff;
@@ -912,7 +926,7 @@ footer {
 }
 
 .index-page .sidebar details:last-of-type {
-  margin-bottom: 0;
+  margin-bottom: 0; /* no extra space at the end */
 }
 
 .index-page .sidebar details[open] summary::after {
@@ -1025,26 +1039,9 @@ footer {
   margin: 20px 0 10px;
 }
 
+
 @media (max-width: 992px) {
   .detail-hero {
     grid-template-columns: 1fr;
   }
-}
-
-/* Error Popup Styles */
-.error-popup {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #e74c3c;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 10000;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-}
-.error-popup.visible {
-  transform: translateX(0);
 }
