@@ -3,8 +3,8 @@
 // ===============================
 let hospitalData = [];
 let filteredHospitalData = [];
-let currentView = 'individuals'; // 'systems' or 'individuals'
-let currentHospitalType = null; // 'Critical Access' or 'Acute Care'
+let currentView = 'individuals';
+let currentHospitalType = null;
 let currentFilters = {
     hospitalTypes: [],
     metrics: [],
@@ -12,28 +12,158 @@ let currentFilters = {
 };
 
 // ===============================
-// Load JSON Data
+// Sample Data
 // ===============================
-fetch("./data/2025/2025_Lown_Index_GA.json")
-  .then(res => res.json())
-  .then(data => {
-    hospitalData = data;
+const sampleHospitalData = [
+    {
+        RECORD_ID: 1,
+        Name: "Atlanta Medical Center",
+        City: "Atlanta",
+        State: "GA",
+        Zip: "30303",
+        Address: "123 Medical Drive",
+        TIER_1_GRADE_Lown_Composite: "A",
+        TIER_2_GRADE_Outcome: "A-",
+        TIER_2_GRADE_Value: "B+",
+        TIER_2_GRADE_Civic: "A",
+        TIER_3_GRADE_Pat_Saf: "B",
+        TIER_3_GRADE_Pat_Exp: "A-",
+        TYPE_urban: 1,
+        TYPE_rural: 0,
+        TYPE_NonProfit: 1,
+        TYPE_ForProfit: 0,
+        TYPE_chrch_affl_f: 0,
+        TYPE_AMC: 1,
+        TYPE_isSafetyNet: 1,
+        TYPE_HospTyp_CAH: 0,
+        TYPE_HospTyp_ACH: 1,
+        Size: "Large",
+        Latitude: 33.7490,
+        Longitude: -84.3880
+    },
+    {
+        RECORD_ID: 2,
+        Name: "Rural Health Clinic",
+        City: "Macon",
+        State: "GA",
+        Zip: "31201",
+        Address: "456 Country Road",
+        TIER_1_GRADE_Lown_Composite: "B+",
+        TIER_2_GRADE_Outcome: "B",
+        TIER_2_GRADE_Value: "A-",
+        TIER_2_GRADE_Civic: "B+",
+        TIER_3_GRADE_Pat_Saf: "A",
+        TIER_3_GRADE_Pat_Exp: "B",
+        TYPE_urban: 0,
+        TYPE_rural: 1,
+        TYPE_NonProfit: 0,
+        TYPE_ForProfit: 1,
+        TYPE_chrch_affl_f: 1,
+        TYPE_AMC: 0,
+        TYPE_isSafetyNet: 0,
+        TYPE_HospTyp_CAH: 1,
+        TYPE_HospTyp_ACH: 0,
+        Size: "Small",
+        Latitude: 32.8306,
+        Longitude: -83.6513
+    },
+    {
+        RECORD_ID: 3,
+        Name: "Savannah Community Hospital",
+        City: "Savannah",
+        State: "GA",
+        Zip: "31401",
+        Address: "789 Coastal Highway",
+        TIER_1_GRADE_Lown_Composite: "A-",
+        TIER_2_GRADE_Outcome: "A",
+        TIER_2_GRADE_Value: "B",
+        TIER_2_GRADE_Civic: "A-",
+        TIER_3_GRADE_Pat_Saf: "B+",
+        TIER_3_GRADE_Pat_Exp: "A",
+        TYPE_urban: 1,
+        TYPE_rural: 0,
+        TYPE_NonProfit: 1,
+        TYPE_ForProfit: 0,
+        TYPE_chrch_affl_f: 0,
+        TYPE_AMC: 0,
+        TYPE_isSafetyNet: 1,
+        TYPE_HospTyp_CAH: 0,
+        TYPE_HospTyp_ACH: 1,
+        Size: "Medium",
+        Latitude: 32.0809,
+        Longitude: -81.0912
+    },
+    {
+        RECORD_ID: 4,
+        Name: "Augusta Medical Center",
+        City: "Augusta",
+        State: "GA",
+        Zip: "30901",
+        Address: "321 River Street",
+        TIER_1_GRADE_Lown_Composite: "C+",
+        TIER_2_GRADE_Outcome: "C",
+        TIER_2_GRADE_Value: "B-",
+        TIER_2_GRADE_Civic: "C+",
+        TIER_3_GRADE_Pat_Saf: "B",
+        TIER_3_GRADE_Pat_Exp: "C",
+        TYPE_urban: 1,
+        TYPE_rural: 0,
+        TYPE_NonProfit: 0,
+        TYPE_ForProfit: 1,
+        TYPE_chrch_affl_f: 0,
+        TYPE_AMC: 1,
+        TYPE_isSafetyNet: 0,
+        TYPE_HospTyp_CAH: 0,
+        TYPE_HospTyp_ACH: 1,
+        Size: "Extra Large",
+        Latitude: 33.4709,
+        Longitude: -81.9748
+    },
+    {
+        RECORD_ID: 5,
+        Name: "Mountain View Hospital",
+        City: "Blue Ridge",
+        State: "GA",
+        Zip: "30513",
+        Address: "654 Highland Avenue",
+        TIER_1_GRADE_Lown_Composite: "B",
+        TIER_2_GRADE_Outcome: "B-",
+        TIER_2_GRADE_Value: "B+",
+        TIER_2_GRADE_Civic: "A-",
+        TIER_3_GRADE_Pat_Saf: "A",
+        TIER_3_GRADE_Pat_Exp: "B-",
+        TYPE_urban: 0,
+        TYPE_rural: 1,
+        TYPE_NonProfit: 1,
+        TYPE_ForProfit: 0,
+        TYPE_chrch_affl_f: 1,
+        TYPE_AMC: 0,
+        TYPE_isSafetyNet: 1,
+        TYPE_HospTyp_CAH: 1,
+        TYPE_HospTyp_ACH: 0,
+        Size: "Extra Small",
+        Latitude: 34.8684,
+        Longitude: -84.3241
+    }
+];
+
+// ===============================
+// Initialize Application
+// ===============================
+document.addEventListener('DOMContentLoaded', function() {
+    hospitalData = sampleHospitalData;
     filteredHospitalData = [...hospitalData];
     console.log("Hospital data loaded:", hospitalData.length, "records");
 
-    // Initial render
     renderHospitals(filteredHospitalData);
     initHospitalMap(filteredHospitalData);
     setupEventListeners();
-
-  })
-  .catch(err => console.error("Error loading JSON:", err));
+});
 
 // ===============================
 // Event Listeners Setup
 // ===============================
 function setupEventListeners() {
-    // View Toggle Buttons
     document.getElementById("viewSystemsBtn").addEventListener("click", () => {
         setViewMode('systems');
     });
@@ -42,7 +172,6 @@ function setupEventListeners() {
         setViewMode('individuals');
     });
 
-    // Hospital Type Buttons (Critical Access vs Acute Care)
     document.getElementById("filterCriticalBtn").addEventListener("click", () => {
         toggleHospitalType('Critical Access');
     });
@@ -51,27 +180,22 @@ function setupEventListeners() {
         toggleHospitalType('Acute Care');
     });
 
-    // Location Search
     document.getElementById("applyLocationBtn").addEventListener("click", applyLocationFilter);
 
-    // Hospital Type Checkboxes
     const hospitalTypeCheckboxes = document.querySelectorAll('input[value="Urban"], input[value="Rural"], input[value="Non-profit"], input[value="For Profit"], input[value="Church Affiliated"], input[value="Academic Medical Center"], input[value="Safety Net"]');
     hospitalTypeCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateHospitalTypeFilters);
     });
 
-    // Metric Category Checkboxes
     const metricCheckboxes = document.querySelectorAll('input[value="Financial Transparency and Institutional Health"], input[value="Community Benefit Spending"], input[value="Healthcare Affordability and Billing"], input[value="Healthcare Access and Social Responsibility"]');
     metricCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateMetricFilters);
     });
 
-    // Action Buttons
     document.getElementById("applyFiltersBtn").addEventListener("click", applyAllFilters);
     document.getElementById("resetFiltersBtn").addEventListener("click", resetAllFilters);
     document.getElementById("downloadDataBtn").addEventListener("click", downloadData);
 
-    // Sort Select
     document.getElementById("sortSelect").addEventListener("change", handleSortChange);
 }
 
@@ -81,21 +205,17 @@ function setupEventListeners() {
 function setViewMode(mode) {
     currentView = mode;
     
-    // Update button states
     const systemsBtn = document.getElementById("viewSystemsBtn");
     const individualsBtn = document.getElementById("viewIndividualsBtn");
-    const individualOptions = document.getElementById("individualOptions");
 
     if (mode === 'systems') {
         systemsBtn.classList.add("active");
         individualsBtn.classList.remove("active");
-        individualOptions.style.display = "none";
         console.log("View set to: Hospital Systems");
-        // TODO: Implement system-level rendering logic
+        showErrorPopup("Hospital Systems view is not yet implemented");
     } else {
         systemsBtn.classList.remove("active");
         individualsBtn.classList.add("active");
-        individualOptions.style.display = "block";
         console.log("View set to: Individual Hospitals");
     }
 
@@ -107,12 +227,10 @@ function toggleHospitalType(type) {
     const acuteBtn = document.getElementById("filterAcuteBtn");
 
     if (currentHospitalType === type) {
-        // Deselect if already selected
         currentHospitalType = null;
         criticalBtn.classList.remove("active");
         acuteBtn.classList.remove("active");
     } else {
-        // Select new type
         currentHospitalType = type;
         if (type === 'Critical Access') {
             criticalBtn.classList.add("active");
@@ -166,25 +284,24 @@ function applyLocationFilter() {
 function applyAllFilters() {
     let filtered = [...hospitalData];
 
-    // Apply hospital type filters
     if (currentFilters.hospitalTypes.length > 0) {
         filtered = filtered.filter(hospital => {
             return currentFilters.hospitalTypes.some(filterType => {
                 switch(filterType) {
                     case 'Urban':
-                        return hospital.TYPE_urban === 1 || hospital.TYPE_urban === '1' || hospital.TYPE_urban === 'Y';
+                        return hospital.TYPE_urban === 1;
                     case 'Rural':
-                        return hospital.TYPE_rural === 1 || hospital.TYPE_rural === '1' || hospital.TYPE_rural === 'Y';
+                        return hospital.TYPE_rural === 1;
                     case 'Non-profit':
-                        return hospital.TYPE_NonProfit === 1 || hospital.TYPE_NonProfit === '1' || hospital.TYPE_NonProfit === 'Y';
+                        return hospital.TYPE_NonProfit === 1;
                     case 'For Profit':
-                        return hospital.TYPE_ForProfit === 1 || hospital.TYPE_ForProfit === '1' || hospital.TYPE_ForProfit === 'Y';
+                        return hospital.TYPE_ForProfit === 1;
                     case 'Church Affiliated':
-                        return hospital.TYPE_chrch_affl_f === 1 || hospital.TYPE_chrch_affl_f === '1' || hospital.TYPE_chrch_affl_f === 'Y';
+                        return hospital.TYPE_chrch_affl_f === 1;
                     case 'Academic Medical Center':
-                        return hospital.TYPE_AMC === 1 || hospital.TYPE_AMC === '1' || hospital.TYPE_AMC === 'Y';
+                        return hospital.TYPE_AMC === 1;
                     case 'Safety Net':
-                        return hospital.TYPE_isSafetyNet === 1 || hospital.TYPE_isSafetyNet === '1' || hospital.TYPE_isSafetyNet === 'Y';
+                        return hospital.TYPE_isSafetyNet === 1;
                     default:
                         return true;
                 }
@@ -192,33 +309,29 @@ function applyAllFilters() {
         });
     }
 
-    // Apply hospital type (Critical Access vs Acute Care)
     if (currentHospitalType) {
         filtered = filtered.filter(hospital => {
             if (currentHospitalType === 'Critical Access') {
-                return hospital.TYPE_HospTyp_CAH === 1 || hospital.TYPE_HospTyp_CAH === '1' || hospital.TYPE_HospTyp_CAH === 'Y';
+                return hospital.TYPE_HospTyp_CAH === 1;
             } else if (currentHospitalType === 'Acute Care') {
-                return hospital.TYPE_HospTyp_ACH === 1 || hospital.TYPE_HospTyp_ACH === '1' || hospital.TYPE_HospTyp_ACH === 'Y';
+                return hospital.TYPE_HospTyp_ACH === 1;
             }
             return true;
         });
     }
 
-    // Apply metric category filters
     if (currentFilters.metrics.length > 0) {
         filtered = filtered.filter(hospital => {
             return currentFilters.metrics.some(metricCategory => {
-                // This is a simplified implementation - you might want to expand this
-                // based on your specific metric mapping
                 switch(metricCategory) {
                     case 'Financial Transparency and Institutional Health':
                         return hospital.TIER_2_GRADE_Value && hospital.TIER_2_GRADE_Value !== 'N/A';
                     case 'Community Benefit Spending':
-                        return hospital.TIER_3_GRADE_CB && hospital.TIER_3_GRADE_CB !== 'N/A';
+                        return hospital.TIER_2_GRADE_Civic && hospital.TIER_2_GRADE_Civic !== 'N/A';
                     case 'Healthcare Affordability and Billing':
-                        return hospital.TIER_3_GRADE_Cost_Eff && hospital.TIER_3_GRADE_Cost_Eff !== 'N/A';
+                        return hospital.TIER_3_GRADE_Pat_Exp && hospital.TIER_3_GRADE_Pat_Exp !== 'N/A';
                     case 'Healthcare Access and Social Responsibility':
-                        return hospital.TIER_3_GRADE_Inclusivity && hospital.TIER_3_GRADE_Inclusivity !== 'N/A';
+                        return hospital.TIER_3_GRADE_Pat_Saf && hospital.TIER_3_GRADE_Pat_Saf !== 'N/A';
                     default:
                         return true;
                 }
@@ -226,18 +339,14 @@ function applyAllFilters() {
         });
     }
 
-    // Apply location filter (simplified - you might want to add actual distance calculation)
     if (currentFilters.location) {
         filtered = filtered.filter(hospital => {
-            // Simple ZIP code matching for demonstration
-            // In a real implementation, you'd calculate distance using coordinates
             return hospital.Zip && hospital.Zip.toString().includes(currentFilters.location.zip);
         });
     }
 
     filteredHospitalData = filtered;
     
-    // Apply current sort
     const sortValue = document.getElementById("sortSelect").value;
     sortAndRender(filteredHospitalData, sortValue);
 }
@@ -246,34 +355,27 @@ function applyAllFilters() {
 // Reset Functionality
 // ===============================
 function resetAllFilters() {
-    // Reset view mode to individuals
     setViewMode('individuals');
     
-    // Reset hospital type
     currentHospitalType = null;
     document.getElementById("filterCriticalBtn").classList.remove("active");
     document.getElementById("filterAcuteBtn").classList.remove("active");
 
-    // Reset checkboxes
     document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
     
-    // Reset location
     document.getElementById("zipInput").value = "";
     document.getElementById("radiusSelect").selectedIndex = 0;
     
-    // Reset filters state
     currentFilters = {
         hospitalTypes: [],
         metrics: [],
         location: null
     };
 
-    // Reset sort
     document.getElementById("sortSelect").selectedIndex = 0;
 
     console.log("All filters reset");
     
-    // Show all hospitals
     filteredHospitalData = [...hospitalData];
     renderHospitals(filteredHospitalData);
     initHospitalMap(filteredHospitalData);
@@ -294,7 +396,6 @@ function sortAndRender(data, sortValue) {
         sorted.sort((a, b) => {
             const gradeA = a.TIER_1_GRADE_Lown_Composite || "F";
             const gradeB = b.TIER_1_GRADE_Lown_Composite || "F";
-            // Custom grade order: A+ > A > A- > B+ > B > B- > C+ > C > C- > D+ > D > D- > F
             const gradeOrder = {
                 'A+': 13, 'A': 12, 'A-': 11,
                 'B+': 10, 'B': 9, 'B-': 8,
@@ -305,13 +406,11 @@ function sortAndRender(data, sortValue) {
             return (gradeOrder[gradeB] || 0) - (gradeOrder[gradeA] || 0);
         });
     } else if (sortValue === "distance") {
-        // For distance sorting, you'd need to implement actual distance calculation
-        // This is a placeholder that sorts by ZIP code similarity
         if (currentFilters.location && currentFilters.location.zip) {
             sorted.sort((a, b) => {
                 const aMatch = a.Zip && a.Zip.toString().includes(currentFilters.location.zip);
                 const bMatch = b.Zip && b.Zip.toString().includes(currentFilters.location.zip);
-                return bMatch - aMatch; // Exact matches first
+                return bMatch - aMatch;
             });
         }
     } else if (sortValue === "name") {
@@ -337,14 +436,11 @@ function sortAndRender(data, sortValue) {
 function downloadData() {
     console.log("Download triggered for", filteredHospitalData.length, "hospitals");
     
-    // Create CSV content
     let csvContent = "data:text/csv;charset=utf-8,";
     
-    // Headers
     const headers = ["Name", "City", "State", "Grade", "Size", "Type", "Address"];
     csvContent += headers.join(",") + "\n";
     
-    // Data rows
     filteredHospitalData.forEach(hospital => {
         const row = [
             `"${hospital.Name || ''}"`,
@@ -358,38 +454,35 @@ function downloadData() {
         csvContent += row.join(",") + "\n";
     });
     
-    // Create download link
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "georgia_hospitals_filtered.csv");
     document.body.appendChild(link);
     
-    // Trigger download
     link.click();
     document.body.removeChild(link);
+    
+    showErrorPopup("Data downloaded successfully!");
 }
 
 function getHospitalType(hospital) {
     const types = [];
-    if (hospital.TYPE_HospTyp_CAH === 1 || hospital.TYPE_HospTyp_CAH === '1') types.push("Critical Access");
-    if (hospital.TYPE_HospTyp_ACH === 1 || hospital.TYPE_HospTyp_ACH === '1') types.push("Acute Care");
-    if (hospital.TYPE_NonProfit === 1 || hospital.TYPE_NonProfit === '1') types.push("Non-profit");
-    if (hospital.TYPE_ForProfit === 1 || hospital.TYPE_ForProfit === '1') types.push("For Profit");
+    if (hospital.TYPE_HospTyp_CAH === 1) types.push("Critical Access");
+    if (hospital.TYPE_HospTyp_ACH === 1) types.push("Acute Care");
+    if (hospital.TYPE_NonProfit === 1) types.push("Non-profit");
+    if (hospital.TYPE_ForProfit === 1) types.push("For Profit");
     return types.join(", ");
 }
 
 // ===============================
-// Render Hospitals (Updated)
+// Render Hospitals
 // ===============================
 function renderHospitals(data) {
     const resultsTable = document.getElementById("hospitalResults");
     const resultsCount = document.getElementById("resultsCount");
 
-    // Clear old results
     resultsTable.innerHTML = "";
-
-    // Update results count
     resultsCount.textContent = `Viewing ${data.length} results`;
 
     if (!data.length) {
@@ -398,11 +491,9 @@ function renderHospitals(data) {
     }
 
     data.forEach(hospital => {
-        // Convert letter grade to star rating
         const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
         const stars = convertGradeToStars(grade);
 
-        // === Main Row ===
         const row = document.createElement("tr");
         row.classList.add("hospital-row");
 
@@ -426,7 +517,6 @@ function renderHospitals(data) {
         `;
         row.appendChild(nameCell);
 
-        // === Buttons ===
         const buttonCell = document.createElement("td");
         buttonCell.classList.add("details-buttons");
 
@@ -438,18 +528,13 @@ function renderHospitals(data) {
         fullDetailsButton.textContent = "View Full Details";
         fullDetailsButton.classList.add("view-full-detail");
         fullDetailsButton.addEventListener("click", () => {
-            if (hospital.RECORD_ID) {
-                window.location.href = `details.html?id=${hospital.RECORD_ID}`;
-            } else {
-                showErrorPopup("Sorry, we couldn't find more details for this hospital.");
-            }
+            showErrorPopup("Full details page would open here for " + hospital.Name);
         });
 
         buttonCell.appendChild(detailsButton);
         buttonCell.appendChild(fullDetailsButton);
         row.appendChild(buttonCell);
 
-        // === Detail Row (collapsed preview) ===
         const detailRow = document.createElement("tr");
         detailRow.classList.add("hospital-detail-row");
         detailRow.style.display = "none";
@@ -467,14 +552,12 @@ function renderHospitals(data) {
         `;
         detailRow.appendChild(detailCell);
 
-        // === Toggle Logic ===
         detailsButton.addEventListener("click", () => {
             const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
             detailRow.style.display = isHidden ? "table-row" : "none";
             detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
         });
 
-        // === Append both rows ===
         resultsTable.appendChild(row);
         resultsTable.appendChild(detailRow);
     });
@@ -482,15 +565,15 @@ function renderHospitals(data) {
 
 function getHospitalTypeDisplay(hospital) {
     const types = [];
-    if (hospital.TYPE_urban === 1 || hospital.TYPE_urban === '1') types.push("Urban");
-    if (hospital.TYPE_rural === 1 || hospital.TYPE_rural === '1') types.push("Rural");
-    if (hospital.TYPE_NonProfit === 1 || hospital.TYPE_NonProfit === '1') types.push("Non-profit");
-    if (hospital.TYPE_ForProfit === 1 || hospital.TYPE_ForProfit === '1') types.push("For Profit");
+    if (hospital.TYPE_urban === 1) types.push("Urban");
+    if (hospital.TYPE_rural === 1) types.push("Rural");
+    if (hospital.TYPE_NonProfit === 1) types.push("Non-profit");
+    if (hospital.TYPE_ForProfit === 1) types.push("For Profit");
     return types.join(" • ");
 }
 
 // ===============================
-// Star Rating Utilities (Keep existing)
+// Star Rating Utilities
 // ===============================
 function convertGradeToStars(grade) {
     const gradeMap = {
@@ -557,19 +640,10 @@ function emptyStarSVG() {
 }
 
 // ===============================
-// Map Integration (Keep existing)
+// Map Integration
 // ===============================
 let map;
 let mapMarkers = [];
-
-function getZipCoords(zip) {
-    const baseLat = 31.0;
-    const baseLon = -85.5;
-    const zipNum = parseInt(String(zip).replace(/\D/g, "")) || 30000;
-    const offsetLat = ((zipNum % 300) / 100) * 0.8;
-    const offsetLon = ((zipNum % 700) / 100) * 0.8;
-    return [baseLat + offsetLat, baseLon + offsetLon];
-}
 
 function initHospitalMap(data) {
     const mapDiv = document.getElementById("mainMap");
@@ -586,24 +660,19 @@ function initHospitalMap(data) {
     mapMarkers = [];
 
     data.forEach(hospital => {
-        let lat = parseFloat(hospital.Latitude) || parseFloat(hospital.LAT) || parseFloat(hospital.lat) || parseFloat(hospital.latitude);
-        let lon = parseFloat(hospital.Longitude) || parseFloat(hospital.LON) || parseFloat(hospital.lon) || parseFloat(hospital.longitude);
-
-        if ((!lat || !lon) && hospital.Zip) {
-            [lat, lon] = getZipCoords(hospital.Zip);
-        }
-        if (!lat || !lon) return;
+        let lat = hospital.Latitude || 32.7;
+        let lon = hospital.Longitude || -83.4;
 
         const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
         const stars = convertGradeToStars(grade);
 
         const popupHTML = `
-            <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
-            ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
+            <strong>${hospital.Name}</strong><br>
+            ${hospital.City}, ${hospital.State}<br>
             <div class="star-rating">${renderStars(stars.value)}</div>
-            <a href="details.html?id=${hospital.RECORD_ID}" target="_blank" class="view-full-detail">
-                View Full Details
-            </a>
+            <button onclick="showErrorPopup('Details for ${hospital.Name}')" class="view-full-detail">
+                View Details
+            </button>
         `;
 
         const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
@@ -623,18 +692,9 @@ function initHospitalMap(data) {
 }
 
 // ===============================
-// Error Popup Utility (Keep existing)
+// Error Popup Utility
 // ===============================
 function showErrorPopup(message) {
     const popup = document.createElement("div");
     popup.className = "error-popup";
-    popup.innerHTML = `<p>${message}</p>`;
-    document.body.appendChild(popup);
-
-    setTimeout(() => popup.classList.add("visible"), 10);
-
-    setTimeout(() => {
-        popup.classList.remove("visible");
-        setTimeout(() => popup.remove(), 400);
-    }, 4000);
-}
+    popup.innerHTML = `<p>${message}</p
