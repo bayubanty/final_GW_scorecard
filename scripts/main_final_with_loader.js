@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let markers = [];
 
     // Load hospital data from JSON file
-    fetch('./data/2025/2025_Lown_Index_GA.json')
+    fetch('./data/2025_Lown_Index_GA.json')
         .then(response => response.json())
         .then(data => {
             hospitalsData = data;
