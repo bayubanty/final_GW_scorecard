@@ -27,7 +27,7 @@ body {
    Header
 =============================== */
 header {
-  background: linear-gradient(#6fb353);
+  background: linear-gradient(#6fb353, #5a9445);
   color: white;
   padding: 8px 0;
   position: relative;
@@ -71,6 +71,11 @@ header {
 }
 
 .nav-links a:hover {
+  text-decoration: underline;
+}
+
+.nav-links a.active {
+  font-weight: bold;
   text-decoration: underline;
 }
 
@@ -136,18 +141,6 @@ header {
   overflow: visible;
 }
 
-/* ===============================
-   Map Column — scrolls naturally
-=============================== */
-.map-section h2 {
-  background-color: #6fb353;
-  color: #fff;
-  font-size: 1.1rem;
-  text-align: center;
-  padding: 10px;
-  margin: 0;
-}
-
 /* =========================================
    FIX — Index Page Map Behavior (Safe Scoped)
 ========================================= */
@@ -171,11 +164,10 @@ header {
 
 .index-page #mainMap {
   width: 100%;
-  height: 500px !important;  /* fixed visible height */
+  height: 500px !important;
   flex: none !important;
   display: block;
 }
-
 
 /* ===============================
    Sidebar
@@ -200,46 +192,6 @@ header {
   margin-top: 0;
   font-size: 16px;
   font-weight: bold;
-}
-
-/* Accordion buttons */
-.accordion {
-  background: #6fb353;
-  color: white;
-  cursor: pointer;
-  padding: 10px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  margin-top: 5px;
-  font-weight: bold;
-  position: relative;
-  border-radius: 5px;
-}
-
-.accordion.active {
-  background: #5a9445;
-}
-
-.accordion::after {
-  content: "▼";
-  font-size: 0.8em;
-  position: absolute;
-  right: 10px;
-  transition: transform 0.2s ease;
-  color: white;
-}
-
-.accordion.active::after {
-  content: "▲";
-}
-
-.panel {
-  display: none;
-  padding: 10px 15px;
-  background: #eee;
-  border-radius: 0 0 5px 5px;
 }
 
 /* Sidebar buttons */
@@ -389,33 +341,35 @@ header {
 .details-buttons {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 6px;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.details-buttons button {
+  flex: 1;
+  min-width: 100%;
+  box-sizing: border-box;
 }
 
 .toggle-detail,
 .view-full-detail {
   background: #f48810;
-  color: white;
+  color: #fff;
   border: none;
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 5px;
   font-size: 14px;
   transition: background 0.2s ease;
-  width: 140px;
   text-align: center;
 }
 
 .toggle-detail:hover,
 .view-full-detail:hover {
   background: #d9740e;
-}
-
-@media (min-width: 992px) {
-  .details-buttons {
-    flex-direction: row;
-  }
 }
 
 /* ===============================
@@ -462,7 +416,7 @@ header {
    Footer
 =============================== */
 footer {
-  background: linear-gradient(#6fb353);
+  background: linear-gradient(#6fb353, #5a9445);
   color: white;
   padding: 30px 0;
   margin-top: 40px;
@@ -589,7 +543,7 @@ footer {
 }
 
 .detail-topbar .spacer {
-  width: 110px; /* roughly the same width as the back button */
+  width: 110px;
 }
 
 .detail-hero-wrap {
@@ -674,7 +628,7 @@ footer {
 
 .services-grid li::before {
   content: "✔";
-  color: #6fb353; /* your green */
+  color: #6fb353;
   font-weight: bold;
   font-size: 0.85em;
 }
@@ -682,7 +636,6 @@ footer {
 .services-grid li:hover {
   background-color: #f4fff7;
 }
-
 
 /* ===== Metrics ===== */
 .metrics-wrap {
@@ -705,7 +658,7 @@ footer {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: #6fb353; /* sponsor green */
+  background: #6fb353;
   color: #ffffff;
   border-bottom: none;
 }
@@ -718,7 +671,7 @@ footer {
 }
 
 .metric-header .star-rating svg {
-  fill: #f48810; /* orange stars */
+  fill: #f48810;
 }
 
 .submetric {
@@ -918,7 +871,7 @@ footer {
 
 /* Add space between accordion sections */
 .index-page .sidebar details {
-  margin-bottom: 10px; /* space between each filter section */
+  margin-bottom: 10px;
   border: 1px solid #cde3c7;
   border-radius: 6px;
   background: #fff;
@@ -926,7 +879,7 @@ footer {
 }
 
 .index-page .sidebar details:last-of-type {
-  margin-bottom: 0; /* no extra space at the end */
+  margin-bottom: 0;
 }
 
 .index-page .sidebar details[open] summary::after {
@@ -969,43 +922,6 @@ footer {
 }
 
 /* =========================================
-   RESULTS BUTTON FIX
-========================================= */
-.details-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-}
-
-.details-buttons button {
-  flex: 1;
-  min-width: 100%;
-  box-sizing: border-box;
-}
-
-.toggle-detail,
-.view-full-detail {
-  background: #f48810;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.2s ease;
-  text-align: center;
-}
-
-.toggle-detail:hover,
-.view-full-detail:hover {
-  background: #d9740e;
-}
-
-/* =========================================
    INLINE STAR ALIGNMENT IN PREVIEW PANE
 ========================================= */
 .detail-info p.inline-stars {
@@ -1039,6 +955,62 @@ footer {
   margin: 20px 0 10px;
 }
 
+/* Error Popup */
+.error-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e74c3c;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 300px;
+}
+
+.error-popup.visible {
+    transform: translateX(0);
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.hospital-link {
+    color: #6fb353;
+    text-decoration: none;
+}
+
+.hospital-link:hover {
+    text-decoration: underline;
+}
+
+small {
+    color: #666;
+    font-size: 0.85em;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-grid p {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-grid strong {
+    min-width: 140px;
+}
 
 @media (max-width: 992px) {
   .detail-hero {
