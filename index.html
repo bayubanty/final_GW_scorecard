@@ -13,14 +13,13 @@
         <div class="container">
             <div class="top-nav">
                 <div class="logo">
-                    <img src="images/logo2White.png" width="auto" height="80" />
-                    <span>Georgia Watch</span>
+                    <span>🏥 Georgia Watch</span>
                 </div>
                 <div class="nav-links">
-                    <a href="rankings.html">Rankings</a>
+                    <a href="index.html" class="active">Rankings</a>
                     <a href="methodology.html">Methodology</a>
-                    <a href="https://georgiawatch.org/about/">About Us</a>
-                    <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+                    <a href="#">About Us</a>
+                    <a href="#" class="donate-btn">Donate</a>
                 </div>
             </div>
             
@@ -39,9 +38,9 @@
                 <h3>View Results By:</h3>
                 <div class="view-buttons">
                     <button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
-                    <button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
+                    <button id="viewIndividualsBtn" class="toggle-btn active">Individual Hospitals</button>
                 </div>
-                <div id="individualOptions" style="display: none; margin-top: 10px;">
+                <div id="individualOptions" style="margin-top: 10px;">
                     <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
                     <div class="view-buttons">
                         <button id="filterCriticalBtn" class="toggle-btn">Critical Access</button>
@@ -55,7 +54,7 @@
                 <h3>Location Search</h3>
                 <label>
                     Enter ZIP Code:
-                    <input type="text" id="zipInput" placeholder="12345">
+                    <input type="text" id="zipInput" placeholder="30303">
                 </label>
                 <br>
                 <label>
@@ -130,13 +129,12 @@
                         </tr>
                     </thead>
                     <tbody id="hospitalResults">
-                        <!-- Results populated by JavaScript -->
+                        <tr>
+                            <td colspan="3" class="loading">Loading hospital data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </section>
-
-            <!-- Dynamic details mount point -->
-            <div id="detailRoot" style="display:none;"></div>
         </main>
 
         <!-- Map Column (Sticky) -->
@@ -153,8 +151,8 @@
             <div class="footer-content">
                 <ul class="footer-links">
                     <li><a href="#">Georgia Watch</a></li>
-                    <li><a href="#">Rankings</a></li>
-                    <li><a href="#">Methodology</a></li>
+                    <li><a href="index.html">Rankings</a></li>
+                    <li><a href="methodology.html">Methodology</a></li>
                     <li><a href="#">About Us</a></li>
                     <li><a href="#">Donate</a></li>
                     <li><a href="#">Legal/Privacy</a></li>
