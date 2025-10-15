@@ -2,7 +2,7 @@
 // Data Storage
 // ===============================
 let hospitalData = [];
-let filteredHospitalData = []; // Add this to track filtered data
+let filteredHospitalData = [];
 
 // ===============================
 // Load JSON Data
@@ -11,7 +11,7 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
-    filteredHospitalData = [...hospitalData]; // Initialize filtered data
+    filteredHospitalData = [...hospitalData];
     console.log("Hospital data loaded:", hospitalData.length, "records");
 
     // Initial render
@@ -62,10 +62,7 @@ function renderHospitals(data) {
           ${hospital.Name || "Unnamed Hospital"}
         </a>
       </strong><br>
-      ${hospital.City || ""}, ${hospital.State || ""}<br>
-      <small class="hospital-meta">
-        ${getHospitalTypeText(hospital)} • ${getSizeText(hospital.Size)} • ${getUrbanRuralText(hospital)}
-      </small>
+      ${hospital.City || ""}, ${hospital.State || ""}
     `;
     row.appendChild(nameCell);
 
@@ -124,37 +121,6 @@ function renderHospitals(data) {
 }
 
 // ===============================
-// Helper Functions for Display Text
-// ===============================
-function getHospitalTypeText(hospital) {
-  const types = [];
-  if (hospital.TYPE_HospTyp_CAH === 1) types.push("Critical Access");
-  if (hospital.TYPE_HospTyp_ACH === 1) types.push("Acute Care");
-  if (hospital.TYPE_AMC === 1) types.push("Academic");
-  if (hospital.TYPE_NonProfit === 1) types.push("Non-profit");
-  if (hospital.TYPE_ForProfit === 1) types.push("For Profit");
-  if (hospital.TYPE_chrch_affl_f === 1) types.push("Faith-based");
-  return types.length > 0 ? types[0] : "Hospital";
-}
-
-function getSizeText(size) {
-  const sizeMap = {
-    "xs": "Extra Small",
-    "s": "Small", 
-    "m": "Medium",
-    "l": "Large",
-    "xl": "Extra Large"
-  };
-  return sizeMap[size] || "Unknown Size";
-}
-
-function getUrbanRuralText(hospital) {
-  if (hospital.TYPE_urban === 1) return "Urban";
-  if (hospital.TYPE_rural === 1) return "Rural";
-  return "Unknown";
-}
-
-// ===============================
 // View Toggle and Filter Buttons
 // ===============================
 const viewSystemsBtn = document.getElementById("viewSystemsBtn");
@@ -176,7 +142,7 @@ filterCriticalBtn.addEventListener("click", () => {
   if (!isActive) {
     filterCriticalBtn.classList.add("active");
   }
-  applyAllFilters(); // Add this to apply filters
+  applyAllFilters();
 });
 
 // Acute Care toggle
@@ -186,7 +152,7 @@ filterAcuteBtn.addEventListener("click", () => {
   if (!isActive) {
     filterAcuteBtn.classList.add("active");
   }
-  applyAllFilters(); // Add this to apply filters
+  applyAllFilters();
 });
 
 // Helper function to get current selection
@@ -200,14 +166,14 @@ viewSystemsBtn.addEventListener("click", () => {
   viewSystemsBtn.classList.add("active");
   viewIndividualsBtn.classList.remove("active");
   individualOptions.style.display = "none";
-  applyAllFilters(); // Add this to apply filters
+  applyAllFilters();
 });
 
 viewIndividualsBtn.addEventListener("click", () => {
   viewIndividualsBtn.classList.add("active");
   viewSystemsBtn.classList.remove("active");
   individualOptions.style.display = "block";
-  applyAllFilters(); // Add this to apply filters
+  applyAllFilters();
 });
 
 // ===============================
@@ -309,14 +275,14 @@ function sortAndRender(data) {
 }
 
 // ===============================
-// Apply Filters Button (Updated)
+// Apply Filters Button
 // ===============================
 document.getElementById("applyFiltersBtn").addEventListener("click", () => {
   applyAllFilters();
 });
 
 // ===============================
-// Reset Filters (Updated)
+// Reset Filters
 // ===============================
 document.getElementById("resetFiltersBtn").addEventListener("click", () => {
   document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
@@ -325,12 +291,12 @@ document.getElementById("resetFiltersBtn").addEventListener("click", () => {
   
   // Reset view buttons
   deactivateHospitalTypeButtons();
-  viewIndividualsBtn.click(); // Set default view
+  viewIndividualsBtn.click();
   
   // Reset to all data
   filteredHospitalData = [...hospitalData];
   renderHospitals(hospitalData);
-  initHospitalMap(hospitalData);
+  updateMapMarkers(hospitalData);
 });
 
 // ===============================
@@ -349,59 +315,93 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
 });
 
 // ===============================
-// Map Functions (Updated)
+// Map Functions - FIXED VERSION
 // ===============================
 let map;
 let mapMarkers = [];
 
+function initHospitalMap(data) {
+  const mapDiv = document.getElementById("mainMap");
+  if (!mapDiv) {
+    console.error("Map container not found!");
+    return;
+  }
+
+  // Initialize map only once
+  if (!map) {
+    console.log("Initializing map...");
+    map = L.map("mainMap").setView([32.7, -83.4], 7);
+    
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+      maxZoom: 18
+    }).addTo(map);
+    
+    console.log("Map initialized successfully");
+  }
+
+  updateMapMarkers(data);
+}
+
 function updateMapMarkers(data) {
+  console.log("Updating map markers with", data.length, "hospitals");
+  
   // Clear old markers
   mapMarkers.forEach(marker => map.removeLayer(marker));
   mapMarkers = [];
 
+  if (data.length === 0) {
+    console.log("No data to display on map");
+    return;
+  }
+
   // Add new markers
   data.forEach(hospital => {
-    let lat = parseFloat(hospital.Latitude) || getZipCoords(hospital.Zip)[0];
-    let lon = parseFloat(hospital.Longitude) || getZipCoords(hospital.Zip)[1];
+    let lat = parseFloat(hospital.Latitude);
+    let lon = parseFloat(hospital.Longitude);
 
-    if (!lat || !lon) return;
+    // If no coordinates, approximate from ZIP code
+    if ((!lat || !lon) && hospital.Zip) {
+      [lat, lon] = getZipCoords(hospital.Zip);
+    }
+
+    if (!lat || !lon) {
+      console.warn("No coordinates for hospital:", hospital.Name);
+      return;
+    }
 
     const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
     const stars = convertGradeToStars(grade);
 
     const popupHTML = `
-      <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
-      ${hospital.City || ""}, ${hospital.State || ""}<br>
-      <div class="star-rating">${renderStars(stars.value)}</div>
-      <a href="details.html?id=${hospital.RECORD_ID}" class="view-full-detail">
-        View Full Details
-      </a>
+      <div class="map-popup">
+        <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+        ${hospital.City || ""}, ${hospital.State || ""}<br>
+        <div class="star-rating">${renderStars(stars.value)}</div>
+        <a href="details.html?id=${hospital.RECORD_ID}" class="view-full-detail">
+          View Full Details
+        </a>
+      </div>
     `;
 
     const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
     mapMarkers.push(marker);
   });
 
+  console.log("Added", mapMarkers.length, "markers to map");
+
   // Adjust map to fit all visible markers
   if (mapMarkers.length > 0) {
     const group = L.featureGroup(mapMarkers);
     map.fitBounds(group.getBounds().pad(0.2));
-  }
-}
-
-function initHospitalMap(data) {
-  const mapDiv = document.getElementById("mainMap");
-  if (!mapDiv) return;
-
-  // Initialize only once
-  if (!map) {
-    map = L.map("mainMap").setView([32.7, -83.4], 7);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
+    console.log("Map bounds adjusted to fit markers");
   }
 
-  updateMapMarkers(data);
+  // Ensure map is properly sized
+  setTimeout(() => {
+    map.invalidateSize();
+    console.log("Map size invalidated");
+  }, 100);
 }
 
 // ===============================
@@ -413,14 +413,27 @@ function getZipCoords(zip) {
     "30606": [33.9597, -83.3764], // Athens
     "31404": [32.0760, -81.0886], // Savannah
     "31533": [31.5185, -82.8499], // Douglas
-    "30553": [34.3434, -83.8003]  // Lavonia
+    "30553": [34.3434, -83.8003], // Lavonia
+    "30720": [34.7698, -84.9719], // Dalton
+    "31201": [32.8306, -83.6513], // Macon
+    "31901": [32.464, -84.9877], // Columbus
+    "31401": [32.0809, -81.0912], // Savannah
+    "31701": [31.5795, -84.1557], // Albany
+    "39817": [30.9043, -84.5762], // Bainbridge
+    "30161": [34.2546, -85.1647], // Rome
+    "30501": [34.2963, -83.8255], // Gainesville
+    "30117": [33.5801, -85.0767], // Carrollton
+    "31093": [32.6184, -83.6272], // Warner Robins
+    "31405": [32.0316, -81.1028], // Savannah
+    "31021": [32.5563, -82.8947], // Dublin
+    "31792": [30.8365, -83.9787]  // Thomasville
   };
-  const coords = lookup[String(zip)] || [32.5, -83.5];
+  const coords = lookup[String(zip)] || [32.5, -83.5]; // Default to central Georgia
   return coords;
 }
 
 // ===============================
-// Star Rating Utilities (Keep Original)
+// Star Rating Utilities
 // ===============================
 function convertGradeToStars(grade) {
   const gradeMap = {
@@ -479,7 +492,7 @@ function emptyStarSVG() {
 }
 
 // ===============================
-// Error Popup Utility (Keep Original)
+// Error Popup Utility
 // ===============================
 function showErrorPopup(message) {
   const popup = document.createElement("div");
