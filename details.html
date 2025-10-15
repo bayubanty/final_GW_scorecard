@@ -30,14 +30,12 @@
         <h1 id="hospitalName">Hospital Name Loading...</h1>
     </div>
 
-    <div class="hospital-title">
-    </div>
-
     <section class="detail-hero-wrap">
         <div class="detail-hero">
             <!-- Left: Map -->
             <div class="hero-card">
                 <h3>Location</h3>
+                <!-- MAP CONTAINER - This will show the hospital location -->
                 <div id="leafletMap"></div>
                 <a id="gmapsLink" class="gmaps-link" href="#" target="_blank">Open in Google Maps</a>
             </div>
@@ -49,13 +47,11 @@
                     <p><span id="streetLine"></span></p>
                     <p><span id="cityStateZip"></span></p>
                 </div>
-
                 <div class="overall-grade-wrap">
                     <h3>Overall Grade: </h3>
                     <div id="overallStars" class="star-rating"></div>
                     <p id="overallGradeText" class="overall-grade-text"></p>
                 </div>
-
                 <div class="info-grid">
                     <p><strong>County:</strong> <span id="hospitalCounty">---</span></p>
                     <p><strong>Size:</strong> <span id="hospitalSize">---</span></p>
@@ -137,7 +133,6 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="scripts/main.js"></script>
     <script src="scripts/details.js"></script>
 </body>
 </html>
