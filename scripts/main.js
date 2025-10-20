@@ -177,6 +177,13 @@ viewIndividualsBtn.addEventListener("click", () => {
 });
 
 // ===============================
+// Apply Location Button - ADD THIS EVENT LISTENER
+// ===============================
+document.getElementById("applyLocationBtn").addEventListener("click", () => {
+  applyAllFilters();
+});
+
+// ===============================
 // Main Filter Function
 // ===============================
 function applyAllFilters() {
@@ -278,13 +285,6 @@ function sortAndRender(data) {
 // Apply Filters Button
 // ===============================
 document.getElementById("applyFiltersBtn").addEventListener("click", () => {
-  applyAllFilters();
-});
-
-// ===============================
-// Apply Location Button - ADDED THIS
-// ===============================
-document.getElementById("applyLocationBtn").addEventListener("click", () => {
   applyAllFilters();
 });
 
