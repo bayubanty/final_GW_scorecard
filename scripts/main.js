@@ -282,6 +282,13 @@ document.getElementById("applyFiltersBtn").addEventListener("click", () => {
 });
 
 // ===============================
+// Apply Location Button - ADDED THIS
+// ===============================
+document.getElementById("applyLocationBtn").addEventListener("click", () => {
+  applyAllFilters();
+});
+
+// ===============================
 // Reset Filters
 // ===============================
 document.getElementById("resetFiltersBtn").addEventListener("click", () => {
