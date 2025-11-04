@@ -1,7 +1,6 @@
 /* ===============================
 Base Styles
 =============================== */
-
 * {
     margin: 0;
     padding: 0;
@@ -25,9 +24,8 @@ body {
 }
 
 /* ===============================
-Header
+Header - Mobile Improvements
 =============================== */
-
 header {
     background: linear-gradient(#6fb353);
     color: white;
@@ -39,37 +37,42 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 28px;
+    font-size: clamp(20px, 5vw, 28px);
     font-weight: 700;
 }
 
 .logo-img {
-    height: 80px;
+    height: 60px;
     width: auto;
 }
 
 .logo-text {
-    font-size: 20px;
+    font-size: clamp(16px, 4vw, 20px);
     font-weight: bold;
     color: white;
 }
 
 .nav-links {
     display: flex;
-    gap: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .nav-links a {
     color: white;
     text-decoration: none;
     font-weight: 500;
-    font-size: 16px;
+    font-size: clamp(14px, 3vw, 16px);
+    padding: 5px 8px;
 }
 
 .nav-links a:hover {
@@ -82,19 +85,31 @@ header {
 }
 
 .header-content h1 {
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 32px);
     margin-bottom: 8px;
 }
 
 .header-content p {
-    font-size: 18px;
+    font-size: clamp(14px, 4vw, 18px);
     font-style: italic;
 }
 
 /* ===============================
-Three-column Layout (Sidebar | Content | Map)
+Mobile Menu - New Addition
 =============================== */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+}
 
+/* ===============================
+Three-column Layout - Mobile Overhaul
+=============================== */
 .main-content {
     display: grid;
     grid-template-columns: 260px 1fr 350px;
@@ -140,9 +155,8 @@ Three-column Layout (Sidebar | Content | Map)
 }
 
 /* ===============================
-Map Column --- scrolls naturally
+Map Column - scrolls naturally
 =============================== */
-
 .map-section h2 {
     background-color: #6fb353;
     color: #fff;
@@ -155,7 +169,6 @@ Map Column --- scrolls naturally
 /* =========================================
 FIX --- Index Page Map Behavior (Safe Scoped)
 ========================================= */
-
 .index-page .map-column {
     position: sticky;
     top: 10px;
@@ -182,15 +195,14 @@ FIX --- Index Page Map Behavior (Safe Scoped)
 }
 
 /* ===============================
-Sidebar
+Sidebar - Mobile Improvements
 =============================== */
-
 .sidebar {
     background: #e7f5e5;
     border: 2px solid #6fb353;
     border-radius: 8px;
     padding: 15px;
-    width: 260px;
+    width: 100%;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
@@ -259,9 +271,10 @@ Sidebar
     background: #6fb353;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 12px;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 14px;
 }
 
 .filter-actions button:hover {
@@ -282,12 +295,13 @@ Sidebar
     background: #6fb353;
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 12px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 500;
     width: 100%;
     transition: background 0.2s ease;
+    font-size: 14px;
 }
 
 #applyLocationBtn:hover {
@@ -295,9 +309,8 @@ Sidebar
 }
 
 /* ===============================
-Filters, Metrics, and Toggles
+Filters, Metrics, and Toggles - Mobile Improvements
 =============================== */
-
 .view-toggle {
     background: #e7f5e5;
     padding: 15px;
@@ -313,17 +326,18 @@ Filters, Metrics, and Toggles
 
 .view-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .toggle-btn {
     flex: 1;
+    min-width: 120px;
     background: #6fb353;
     color: white;
     border: none;
-    padding: 12px 16px;
-    font-size: 16px;
+    padding: 12px 8px;
+    font-size: 14px;
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -338,12 +352,11 @@ Filters, Metrics, and Toggles
 }
 
 /* ===============================
-Results Table
+Results Table - Mobile Overhaul
 =============================== */
-
 .search-section {
     background-color: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -354,7 +367,7 @@ Results Table
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     gap: 10px;
 }
 
@@ -363,6 +376,7 @@ Results Table
     align-items: center;
     gap: 6px;
     font-size: 14px;
+    flex-wrap: wrap;
 }
 
 .results-table {
@@ -375,14 +389,16 @@ Results Table
 .results-table th {
     background-color: #f0f0f0;
     text-align: left;
-    padding: 12px 15px;
+    padding: 12px 8px;
     border-bottom: 2px solid #ddd;
+    font-size: 14px;
 }
 
 .results-table td {
-    padding: 12px 15px;
+    padding: 12px 8px;
     border: 2px solid #6fb353;
     border-radius: 8px;
+    font-size: 14px;
 }
 
 .results-table tr {
@@ -391,9 +407,8 @@ Results Table
 }
 
 /* ===============================
-Buttons (Two per Row)
+Buttons (Two per Row) - Mobile Improvements
 =============================== */
-
 .details-buttons {
     display: flex;
     flex-direction: column;
@@ -406,12 +421,13 @@ Buttons (Two per Row)
     background: #f48810;
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 10px 12px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 13px;
     transition: background 0.2s ease;
-    width: 140px;
+    width: 100%;
+    max-width: 140px;
     text-align: center;
 }
 
@@ -420,43 +436,36 @@ Buttons (Two per Row)
     background: #d9740e;
 }
 
-@media (min-width: 992px) {
-    .details-buttons {
-        flex-direction: row;
-    }
-}
-
 /* ===============================
-Detail Rows (Expandable)
+Detail Rows (Expandable) - Mobile Improvements
 =============================== */
-
 .hospital-detail-row {
     background-color: #f9f9f9;
     border-top: 2px solid #6fb353;
 }
 
 .detail-info {
-    padding: 10px 20px;
-    font-size: 0.95em;
+    padding: 10px 15px;
+    font-size: 0.9em;
     background: #f9f9f9;
     border-radius: 0 0 8px 8px;
     line-height: 1.4;
 }
 
 /* ===============================
-Star Ratings
+Star Ratings - Mobile Adjustments
 =============================== */
-
 .star-rating {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
+    flex-wrap: wrap;
 }
 
 .star {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     fill: #a4cc95;
 }
 
@@ -469,9 +478,8 @@ Star Ratings
 }
 
 /* ===============================
-Footer
+Footer - Mobile Improvements
 =============================== */
-
 footer {
     background: linear-gradient(#6fb353);
     color: white;
@@ -489,7 +497,7 @@ footer {
 .footer-links {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
     list-style: none;
 }
@@ -497,6 +505,8 @@ footer {
 .footer-links a {
     color: white;
     text-decoration: none;
+    font-size: 14px;
+    padding: 5px;
 }
 
 .footer-links a:hover {
@@ -509,58 +519,338 @@ footer {
 }
 
 /* ===============================
-Responsive Adjustments
+Responsive Adjustments - COMPREHENSIVE MOBILE OVERHAUL
 =============================== */
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 240px 1fr 320px;
+        gap: 15px;
+    }
+}
 
 @media (max-width: 992px) {
     .main-content {
         grid-template-columns: 1fr;
+        grid-template-areas: 
+            "sidebar"
+            "content"
+            "map";
+        gap: 15px;
     }
+    
+    .sidebar {
+        grid-area: sidebar;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .content-area {
+        grid-area: content;
+    }
+    
     .map-column {
+        grid-area: map;
         position: static;
         height: auto;
     }
+    
+    .index-page .map-column {
+        position: static;
+    }
+    
+    .index-page .map-section {
+        position: static;
+    }
+    
     #mainMap {
         height: 400px;
+    }
+    
+    .detail-hero {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .hero-card {
+        min-height: auto;
+    }
+    
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .main-content {
+        padding: 0 10px;
+        gap: 10px;
+    }
+    
     .top-nav {
         flex-direction: column;
         gap: 15px;
+        padding: 10px 0;
     }
+    
     .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
     }
+    
+    .nav-links a {
+        flex: 1;
+        text-align: center;
+        padding: 8px 5px;
+        font-size: 13px;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
     .results-header {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
     }
-    .footer-content {
-        flex-direction: column;
-    }
+    
     .results-table {
         display: block;
         overflow-x: auto;
+        white-space: nowrap;
     }
-    .details-grid,
-    .detail-page-grid {
+    
+    .results-table th,
+    .results-table td {
+        min-width: 100px;
+        padding: 10px 8px;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .view-buttons {
+        flex-direction: column;
+    }
+    
+    .toggle-btn {
+        min-width: 100%;
+    }
+    
+    .filter-group {
         grid-template-columns: 1fr;
     }
-    .hospital-header {
+    
+    .detail-topbar {
         flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .detail-topbar h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .metric-header {
+        flex-direction: column;
+        gap: 10px;
         align-items: flex-start;
-        gap: 15px;
+    }
+    
+    .metric-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .main-content {
+        padding: 0 5px;
+    }
+    
+    .logo {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+    
+    .logo-img {
+        height: 50px;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .nav-links a {
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+    }
+    
+    .header-content {
+        padding: 15px 0;
+    }
+    
+    .sidebar {
+        padding: 10px;
+    }
+    
+    .search-section {
+        padding: 10px;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    .star {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .details-buttons {
+        gap: 4px;
+    }
+    
+    .toggle-detail,
+    .view-full-detail {
+        padding: 8px 10px;
+        font-size: 12px;
+        max-width: 120px;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .methodology-hero {
+        padding: 40px 15px;
+    }
+    
+    .methodology-hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .methodology-content {
+        padding: 20px 15px;
     }
 }
 
 /* ===============================
-Detail Page Styles
+Touch Device Improvements
 =============================== */
+@media (hover: none) and (pointer: coarse) {
+    .toggle-btn,
+    .details-button,
+    .nav-links a,
+    .filter-actions button {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+    
+    input[type="checkbox"],
+    input[type="radio"] {
+        transform: scale(1.2);
+        margin-right: 8px;
+    }
+    
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 8px;
+    }
+    
+    .star-rating {
+        gap: 4px;
+    }
+    
+    .star {
+        width: 20px;
+        height: 20px;
+    }
+}
 
+/* ===============================
+High DPI Screen Optimizations
+=============================== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo-img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* ===============================
+Print Styles
+=============================== */
+@media print {
+    .sidebar,
+    .map-column,
+    .mobile-menu-toggle,
+    .donate-btn {
+        display: none !important;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    a {
+        color: black;
+        text-decoration: underline;
+    }
+}
+
+/* ===============================
+Reduced Motion Support
+=============================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===============================
+Detail Page Styles - Mobile Improvements
+=============================== */
 .detail-topbar {
     display: flex;
     align-items: center;
@@ -574,12 +864,15 @@ Detail Page Styles
 .detail-topbar .btn.back {
     background-color: #f48810;
     color: #fff;
-    padding: 6px 12px;
+    padding: 10px 15px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
     transition: background-color 0.2s ease;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .detail-topbar .btn.back:hover {
@@ -587,7 +880,7 @@ Detail Page Styles
 }
 
 .detail-topbar h1 {
-    font-size: 1.6rem;
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
     font-weight: 700;
     margin: 0;
     flex: 1;
@@ -631,6 +924,7 @@ Detail Page Styles
 
 .hero-card h3 {
     margin-bottom: 4px;
+    font-size: clamp(1rem, 4vw, 1.2rem);
 }
 
 #leafletMap {
@@ -653,12 +947,11 @@ Detail Page Styles
 }
 
 /* =========================================
-SERVICES GRID STYLING
+SERVICES GRID STYLING - Mobile Improvements
 ========================================= */
-
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px 16px;
     list-style: none;
     padding: 0;
@@ -669,8 +962,8 @@ SERVICES GRID STYLING
     background-color: #f9faf9;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.95rem;
+    padding: 8px 12px;
+    font-size: 0.9rem;
     color: #333;
     line-height: 1.4;
     display: flex;
@@ -691,7 +984,6 @@ SERVICES GRID STYLING
 }
 
 /* ===== Metrics ===== */
-
 .metrics-wrap {
     width: 100%;
     max-width: none;
@@ -718,7 +1010,7 @@ SERVICES GRID STYLING
 }
 
 .metric-header h2 {
-    font-size: 1.15rem;
+    font-size: clamp(1rem, 4vw, 1.15rem);
     margin: 0;
     color: #ffffff;
     font-weight: 700;
@@ -740,6 +1032,7 @@ SERVICES GRID STYLING
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-height: 44px;
 }
 
 .submetric summary::after {
@@ -760,40 +1053,41 @@ SERVICES GRID STYLING
 }
 
 /* ===============================
-Methodology Page Styles
+Methodology Page Styles - Mobile Improvements
 =============================== */
-
 .methodology-hero {
     background: linear-gradient(135deg, #6fb353, #5aa345);
     color: #fff;
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 20px;
 }
 
 .methodology-hero h1 {
-    font-size: 2.4rem;
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
     margin-bottom: 10px;
 }
 
 .methodology-hero .lead {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3vw, 1.1rem);
     max-width: 800px;
     margin: 0 auto;
 }
 
 .methodology-content {
-    padding: 40px 20px;
+    padding: 30px 15px;
 }
 
 .methodology-content h2 {
     color: #6fb353;
     margin-top: 30px;
+    font-size: clamp(1.3rem, 4vw, 1.6rem);
 }
 
 .methodology-content p,
 .methodology-content ul {
     margin-top: 10px;
     line-height: 1.6;
+    font-size: clamp(0.9rem, 3vw, 1rem);
 }
 
 .category-grid {
@@ -815,6 +1109,7 @@ Methodology Page Styles
 .category-card h3 {
     color: #6fb353;
     margin-bottom: 8px;
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
 }
 
 .category-card:hover {
@@ -834,6 +1129,9 @@ Methodology Page Styles
     font-weight: bold;
     color: #6fb353;
     cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .methodology-faq p {
@@ -842,11 +1140,10 @@ Methodology Page Styles
 }
 
 /* ===== Methodology Download Section ===== */
-
 .methodology-download {
     text-align: center;
     background: #f8f8f8;
-    padding: 60px 20px;
+    padding: 40px 20px;
     margin: 40px 0;
     border-top: 2px solid #6fb35333;
     border-bottom: 2px solid #6fb35333;
@@ -855,24 +1152,27 @@ Methodology Page Styles
 .methodology-download h2 {
     color: #6fb353;
     margin-bottom: 10px;
-    font-size: 1.8rem;
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
 }
 
 .methodology-download p {
     color: #555;
     max-width: 700px;
     margin: 0 auto 20px;
+    font-size: clamp(0.9rem, 3vw, 1rem);
 }
 
 .btn-download {
     display: inline-block;
     background: #6fb353;
     color: #fff;
-    padding: 12px 24px;
+    padding: 14px 28px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
     transition: background 0.2s ease;
+    min-height: 44px;
+    font-size: 1rem;
 }
 
 .btn-download:hover {
@@ -893,14 +1193,13 @@ Methodology Page Styles
 }
 
 /* =========================================
-INDEX PAGE --- LAYOUT + FILTERS
+INDEX PAGE --- LAYOUT + FILTERS - Mobile Improvements
 ========================================= */
-
 /* Smaller, cleaner filter headers */
 .index-page .sidebar summary {
     background: #6fb353;
     color: #fff;
-    padding: 6px 10px;
+    padding: 12px 10px;
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -911,6 +1210,7 @@ INDEX PAGE --- LAYOUT + FILTERS
     justify-content: space-between;
     line-height: 1.2;
     border-radius: 4px 4px 0 0;
+    min-height: 44px;
 }
 
 .index-page .sidebar summary::marker {
@@ -944,16 +1244,27 @@ INDEX PAGE --- LAYOUT + FILTERS
 .index-page .filter-group {
     display: flex;
     flex-direction: column;
-    padding: 8px 12px 10px;
+    padding: 12px;
     background: #f8f8f8;
-    gap: 6px;
+    gap: 8px;
     font-size: 0.9rem;
 }
 
-/* =========================================
-COLUMN BEHAVIOR (NORMAL SCROLL)
-========================================= */
+.index-page .filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    cursor: pointer;
+}
 
+.index-page .filter-group input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+/* =========================================
+COLUMN BEHAVIOR (NORMAL SCROLL) - Mobile Optimized
+========================================= */
 .main-content {
     display: grid;
     grid-template-columns: 260px 1fr 350px;
@@ -978,14 +1289,13 @@ COLUMN BEHAVIOR (NORMAL SCROLL)
 }
 
 /* =========================================
-RESULTS BUTTON FIX
+RESULTS BUTTON FIX - Mobile Improvements
 ========================================= */
-
 .details-buttons {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     height: 100%;
     justify-content: center;
@@ -995,6 +1305,7 @@ RESULTS BUTTON FIX
     flex: 1;
     min-width: 100%;
     box-sizing: border-box;
+    min-height: 44px;
 }
 
 .toggle-detail,
@@ -1002,7 +1313,7 @@ RESULTS BUTTON FIX
     background: #f48810;
     color: #fff;
     border: none;
-    padding: 8px 12px;
+    padding: 12px;
     cursor: pointer;
     border-radius: 5px;
     font-size: 14px;
@@ -1018,12 +1329,12 @@ RESULTS BUTTON FIX
 /* =========================================
 INLINE STAR ALIGNMENT IN PREVIEW PANE
 ========================================= */
-
 .detail-info p.inline-stars {
     display: flex;
     align-items: center;
     gap: 6px;
     margin: 4px 0;
+    flex-wrap: wrap;
 }
 
 .detail-info .star-rating {
@@ -1034,8 +1345,8 @@ INLINE STAR ALIGNMENT IN PREVIEW PANE
 }
 
 .detail-info .star {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 
 /* Optional: neat label column alignment */
@@ -1050,8 +1361,43 @@ INLINE STAR ALIGNMENT IN PREVIEW PANE
     margin: 20px 0 10px;
 }
 
-@media (max-width: 992px) {
-    .detail-hero {
-        grid-template-columns: 1fr;
+/* ===============================
+Utility Classes for Mobile
+=============================== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.no-scroll {
+    overflow: hidden;
+}
+
+.text-center-mobile {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .text-center-mobile {
+        text-align: center;
+    }
+    
+    .hide-mobile {
+        display: none !important;
+    }
+    
+    .show-mobile {
+        display: block !important;
+    }
+    
+    .full-width-mobile {
+        width: 100% !important;
     }
 }
