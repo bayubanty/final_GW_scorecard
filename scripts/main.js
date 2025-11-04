@@ -34,7 +34,6 @@ function initMobileFeatures() {
     
     if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener('click', function() {
-            this.classList.toggle('active');
             navLinks.classList.toggle('active');
         });
     }
@@ -43,7 +42,7 @@ function initMobileFeatures() {
     const mobileFilterToggle = document.getElementById('mobileFilterToggle');
     const sidebar = document.getElementById('sidebar');
     const closeSidebar = document.getElementById('closeSidebar');
-    const overlay = document.getElementById('overlay');
+    const overlay = document.getElementById('mobileOverlay');
     
     if (mobileFilterToggle) {
         mobileFilterToggle.addEventListener('click', function() {
@@ -67,13 +66,13 @@ function initMobileFeatures() {
     
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', function() {
-            setTimeout(closeMobileSidebar, 300);
+            setTimeout(closeMobileSidebar, 500);
         });
     }
     
     if (resetFiltersBtn) {
         resetFiltersBtn.addEventListener('click', function() {
-            setTimeout(closeMobileSidebar, 300);
+            setTimeout(closeMobileSidebar, 500);
         });
     }
     
@@ -111,21 +110,13 @@ function initMobileFeatures() {
 
 function closeMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const overlay = document.getElementById('mobileOverlay');
     const navLinks = document.querySelector('.nav-links');
     
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
+    if (sidebar) sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    if (navLinks) navLinks.classList.remove('active');
     document.body.style.overflow = '';
-    
-    // Also close mobile menu if open
-    if (mobileMenuToggle) {
-        mobileMenuToggle.classList.remove('active');
-    }
-    if (navLinks) {
-        navLinks.classList.remove('active');
-    }
 }
 
 // ===============================
@@ -429,29 +420,33 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
 // ===============================
 // Map Functions
 // ===============================
-let desktopMap;
+let map;
 let mobileMap;
 let mapMarkers = [];
 
 function initHospitalMap(data) {
     // Initialize desktop map
-    const desktopMapDiv = document.getElementById("desktopMap");
-    if (desktopMapDiv) {
-        desktopMap = L.map("desktopMap").setView([32.7, -83.4], 7);
+    const mapDiv = document.getElementById("mainMap");
+    if (mapDiv) {
+        console.log("Initializing desktop map...");
+        map = L.map("mainMap").setView([32.7, -83.4], 7);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "&copy; OpenStreetMap contributors",
             maxZoom: 18
-        }).addTo(desktopMap);
+        }).addTo(map);
+        console.log("Desktop map initialized successfully");
     }
 
     // Initialize mobile map
     const mobileMapDiv = document.getElementById("mobileMap");
     if (mobileMapDiv) {
+        console.log("Initializing mobile map...");
         mobileMap = L.map("mobileMap").setView([32.7, -83.4], 7);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "&copy; OpenStreetMap contributors",
             maxZoom: 18
         }).addTo(mobileMap);
+        console.log("Mobile map initialized successfully");
     }
 
     updateMapMarkers(data);
@@ -462,7 +457,7 @@ function updateMapMarkers(data) {
 
     // Clear old markers
     mapMarkers.forEach(marker => {
-        if (desktopMap) desktopMap.removeLayer(marker);
+        if (map) map.removeLayer(marker);
         if (mobileMap) mobileMap.removeLayer(marker);
     });
     mapMarkers = [];
@@ -502,8 +497,8 @@ function updateMapMarkers(data) {
         `;
 
         // Add to desktop map
-        if (desktopMap) {
-            const marker = L.marker([lat, lon]).addTo(desktopMap).bindPopup(popupHTML);
+        if (map) {
+            const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
             mapMarkers.push(marker);
         }
 
@@ -519,14 +514,14 @@ function updateMapMarkers(data) {
     // Adjust map to fit all visible markers
     if (mapMarkers.length > 0) {
         const group = L.featureGroup(mapMarkers);
-        if (desktopMap) desktopMap.fitBounds(group.getBounds().pad(0.2));
+        if (map) map.fitBounds(group.getBounds().pad(0.2));
         if (mobileMap) mobileMap.fitBounds(group.getBounds().pad(0.2));
         console.log("Map bounds adjusted to fit markers");
     }
 
     // Ensure maps are properly sized
     setTimeout(() => {
-        if (desktopMap) desktopMap.invalidateSize();
+        if (map) map.invalidateSize();
         if (mobileMap) mobileMap.invalidateSize();
         console.log("Map sizes invalidated");
     }, 100);
