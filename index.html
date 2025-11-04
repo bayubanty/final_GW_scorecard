@@ -13,7 +13,7 @@
         <div class="container">
             <div class="top-nav">
                 <div class="logo">
-                    <img src="images/logo2White.png" width="auto" height="80" />
+                    <img src="images/logo2White.png" width="auto" height="80" alt="Georgia Watch Logo">
                     <span>Georgia Watch</span>
                 </div>
                 <div class="nav-links">
@@ -21,6 +21,11 @@
                     <a href="methodology.html">Methodology</a>
                     <a href="https://georgiawatch.org/about/">About Us</a>
                     <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+                </div>
+                <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
             <div class="header-content">
@@ -30,9 +35,27 @@
         </div>
     </header>
 
+    <!-- Mobile Map Section -->
+    <div class="mobile-map-section">
+        <section class="map-section">
+            <h2>HOSPITAL LOCATIONS</h2>
+            <div id="mainMap"></div>
+        </section>
+    </div>
+
+    <!-- Mobile Filter Toggle -->
+    <div class="mobile-filter-toggle" id="mobileFilterToggle">
+        <span>Filters & Search</span>
+    </div>
+
     <div class="main-content">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Filters</h2>
+                <button class="close-sidebar" id="closeSidebar">×</button>
+            </div>
+            
             <!-- View Toggle -->
             <div class="view-toggle">
                 <h3>View Results By:</h3>
@@ -114,7 +137,7 @@
                         <select id="sortSelect">
                             <option value="grade">Grade (High to Low)</option>
                             <option value="distance">Distance (Closest First)</option>
-                            <option value="name">Hospital Name (A--Z)</option>
+                            <option value="name">Hospital Name (A-Z)</option>
                             <option value="size">Bed Size (Small → Extra Large)</option>
                         </select>
                     </label>
@@ -137,17 +160,15 @@
             <div id="detailRoot" style="display:none;"></div>
         </main>
 
-        <!-- Map Column (Sticky) -->
+        <!-- Desktop Map Column (Sticky) -->
         <div class="map-column">
             <section class="map-section">
                 <h2>HOSPITAL LOCATIONS</h2>
-                <div id="mainMap"></div>
+                <div id="desktopMap"></div>
             </section>
         </div>
     </div>
-    
-                        <!-- Filter Trigger Button for Mobile -->
-<button class="filter-trigger">Open Filters</button>
+
     <footer>
         <div class="container">
             <div class="footer-content">
