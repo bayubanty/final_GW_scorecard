@@ -171,7 +171,7 @@ Three-column Layout (Sidebar | Content | Map)
     margin: 0;
 }
 
-#mobileMap, #desktopMap {
+#mainMap, #mobileMap {
     flex: 1;
     width: 100%;
     height: 100%;
@@ -221,7 +221,7 @@ FIX --- Index Page Map Behavior (Safe Scoped)
     display: block !important;
 }
 
-.index-page #desktopMap {
+.index-page #mainMap {
     width: 100%;
     height: 500px !important; /* fixed visible height */
     flex: none !important;
@@ -656,7 +656,7 @@ Responsive Adjustments
         border-bottom: none;
     }
     
-    .overlay {
+    .mobile-overlay {
         position: fixed;
         top: 0;
         left: 0;
@@ -667,7 +667,7 @@ Responsive Adjustments
         display: none;
     }
     
-    .overlay.active {
+    .mobile-overlay.active {
         display: block;
     }
 }
@@ -725,30 +725,6 @@ Responsive Adjustments
     
     .toggle-btn {
         width: 100%;
-    }
-    
-    /* Detail page mobile adjustments */
-    .detail-hero {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .hero-card {
-        padding: 12px;
-    }
-    
-    .services-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .metric-header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-    }
-    
-    .metric-header h2 {
-        font-size: 1rem;
     }
 }
 
@@ -1239,7 +1215,7 @@ INLINE STAR ALIGNMENT IN PREVIEW PANE
 MOBILE OVERLAY
 ========================================= */
 
-.overlay {
+.mobile-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1250,7 +1226,7 @@ MOBILE OVERLAY
     display: none;
 }
 
-.overlay.active {
+.mobile-overlay.active {
     display: block;
 }
 
@@ -1270,20 +1246,4 @@ DONATE BUTTON
 .donate-btn:hover {
     background-color: #d9740e;
     text-decoration: none;
-}
-
-/* =========================================
-MOBILE MENU ANIMATION
-========================================= */
-
-.mobile-menu-toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.mobile-menu-toggle.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.mobile-menu-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
 }
