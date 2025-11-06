@@ -1,146 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hospital Details | Georgia Watch</title>
-    <link rel="stylesheet" href="styles/main.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Georgia Hospital System Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles/main.css">
 </head>
-<body class="details-page">
-    <!-- ===== Header ===== -->
+<body class="index-page">
     <header>
-        <div class="container top-nav">
-            <div class="logo">
-                <img src="images/logo2White.png" height="80" alt="Georgia Watch logo" />
-                <span>Georgia Watch</span>
+        <div class="container">
+            <div class="top-nav">
+                <div class="logo">
+                    <img src="images/logo2White.png" width="auto" height="60" alt="Georgia Watch Logo">
+                    <span>Georgia Watch</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="nav-links">
+                    <a href="index.html">Rankings</a>
+                    <a href="methodology.html">Methodology</a>
+                    <a href="https://georgiawatch.org/about/">About Us</a>
+                    <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+                </nav>
+                
+                <!-- Mobile Navigation Toggle -->
+                <button class="mobile-nav-toggle" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
-            <nav class="nav-links">
-                <a href="index.html">Rankings</a>
-                <a href="methodology.html">Methodology</a>
-                <a href="https://georgiawatch.org/about/">About Us</a>
-                <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
-            </nav>
-            <div class="mobile-menu-toggle" id="mobileMenuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
+            
+            <div class="header-content">
+                <h1>GEORGIA WATCH</h1>
+                <p>Advocating for patients and protecting consumers since 2002</p>
             </div>
         </div>
     </header>
 
-    <!-- ===== HERO SECTION ===== -->
-    <div class="detail-topbar">
-        <a href="index.html" class="btn back">← Back to Results</a>
-        <h1 id="hospitalName">Hospital Name Loading...</h1>
-    </div>
-
-    <div class="hospital-title">
-    </div>
-
-    <section class="detail-hero-wrap">
-        <div class="detail-hero">
-            <!-- Left: Map -->
-            <div class="hero-card">
-                <h3>Location</h3>
-                <div id="leafletMap"></div>
-                <a id="gmapsLink" class="gmaps-link" href="#" target="_blank">Open in Google Maps</a>
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-panel">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <img src="images/logo2White.png" width="auto" height="50" alt="Georgia Watch Logo">
+                <span>Georgia Watch</span>
             </div>
-
-            <!-- Center: Hospital Info -->
-            <div class="hero-card">
-                <div class="address-block" id="hospitalAddress">
-                    <h3>Address: </h3>
-                    <p><span id="streetLine"></span></p>
-                    <p><span id="cityStateZip"></span></p>
-                </div>
-                <div class="overall-grade-wrap">
-                    <h3>Overall Grade: </h3>
-                    <div id="overallStars" class="star-rating"></div>
-                    <p id="overallGradeText" class="overall-grade-text"></p>
-                </div>
-                <div class="info-grid">
-                    <p><strong>County:</strong> <span id="hospitalCounty">---</span></p>
-                    <p><strong>Size:</strong> <span id="hospitalSize">---</span></p>
-                    <p><strong>Type:</strong> <span id="hospitalType">---</span></p>
-                    <p><strong>Care Level:</strong> <span id="hospitalCareLevel">---</span></p>
-                    <p><strong>System Affiliation:</strong> <span id="hospitalSystem">---</span></p>
-                    <p><strong>Setting:</strong> <span id="hospitalUrbanRural">---</span></p>
-                    <p><strong>Beds:</strong> <span id="hospitalBeds">---</span></p>
-                </div>
-            </div>
-
-            <!-- Right: Services -->
-            <div class="hero-card">
-                <h3>Services Offered</h3>
-                <ul id="hospitalServices" class="services-grid"></ul>
-            </div>
+            <button class="mobile-nav-close" aria-label="Close navigation menu">×</button>
         </div>
-    </section>
+        <nav class="mobile-nav-links">
+            <a href="index.html" class="active">Rankings</a>
+            <a href="methodology.html">Methodology</a>
+            <a href="https://georgiawatch.org/about/">About Us</a>
+            <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+        </nav>
+    </div>
+    <div class="mobile-nav-overlay"></div>
 
-    <!-- ===== METRIC SECTIONS ===== -->
-    <main class="metrics-wrap" id="metricsRoot">
-        <section id="financialTransparency" class="metric-section">
-            <div class="metric-header">
-                <h2>Financial Transparency & Institutional Health</h2>
-                <div class="star-rating" id="financialTransparencyStars"></div>
+    <!-- Mobile Filters Button -->
+    <button class="mobile-filters-toggle">
+        <span>☰ Filters & Search</span>
+    </button>
+
+    <div class="main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Filters</h3>
+                <button class="mobile-sidebar-close" aria-label="Close filters">×</button>
             </div>
-            <details class="submetric"><summary>Balance Growth</summary><p>How well the hospital manages financial stability while expanding responsibly.</p></details>
-            <details class="submetric"><summary>Transparency</summary><p>How openly the hospital shares financial data and policies with the public.</p></details>
-            <details class="submetric"><summary>Fiscal Health</summary><p>Evaluates liquidity, debt ratios, and overall financial health indicators.</p></details>
-            <details class="submetric"><summary>Staffing</summary><p>Assesses staff-to-patient ratios and investment in personnel stability.</p></details>
-        </section>
 
-        <section id="communityBenefit" class="metric-section">
-            <div class="metric-header">
-                <h2>Community Benefit Spending</h2>
-                <div class="star-rating" id="communityBenefitStars"></div>
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <h3>View Results By:</h3>
+                <div class="view-buttons">
+                    <button id="viewSystemsBtn" class="toggle-btn active">Hospital Systems</button>
+                    <button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
+                </div>
+                <div id="individualOptions" style="display: none; margin-top: 10px;">
+                    <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
+                    <div class="view-buttons">
+                        <button id="filterCriticalBtn" class="toggle-btn">Critical Access</button>
+                        <button id="filterAcuteBtn" class="toggle-btn">Acute Care</button>
+                    </div>
+                </div>
             </div>
-            <details class="submetric"><summary>Tax Benefit</summary><p>Compares nonprofit tax benefit value against community benefit spending.</p></details>
-            <details class="submetric"><summary>Quality of CBS</summary><p>Evaluates effectiveness of programs in meeting community health needs.</p></details>
-            <details class="submetric"><summary>Strategic Use</summary><p>Assesses whether funds are directed to long-term community improvement.</p></details>
-        </section>
 
-        <section id="affordabilityBilling" class="metric-section">
-            <div class="metric-header">
-                <h2>Healthcare Affordability & Billing</h2>
-                <div class="star-rating" id="affordabilityBillingStars"></div>
+            <!-- Location Search -->
+            <div class="location-search">
+                <h3>Location Search</h3>
+                <label>
+                    Enter ZIP Code:
+                    <input type="text" id="zipInput" placeholder="12345" maxlength="5">
+                </label>
+                <br>
+                <label>
+                    Radius:
+                    <select id="radiusSelect">
+                        <option value="5">5 miles</option>
+                        <option value="10">10 miles</option>
+                        <option value="15">15 miles</option>
+                        <option value="20">20 miles</option>
+                        <option value="25">25 miles</option>
+                        <option value="30">30 miles</option>
+                    </select>
+                </label>
+                <button id="applyLocationBtn">Apply Location</button>
             </div>
-            <details class="submetric"><summary>Financial Burden</summary><p>Assesses patient out-of-pocket expenses relative to income and coverage.</p></details>
-            <details class="submetric"><summary>Charity Care</summary><p>Measures how effectively the hospital provides free or reduced-cost care.</p></details>
-            <details class="submetric"><summary>Medical Debt</summary><p>Analyzes collection practices and how often patients accrue medical debt.</p></details>
-        </section>
 
-        <section id="accessResponsibility" class="metric-section">
-            <div class="metric-header">
-                <h2>Healthcare Access & Social Responsibility</h2>
-                <div class="star-rating" id="accessResponsibilityStars"></div>
+            <!-- Hospital Type -->
+            <details class="filter-section" open>
+                <summary>Refine by Hospital Type</summary>
+                <div class="filter-group">
+                    <label><input type="checkbox" value="Urban"> Urban</label>
+                    <label><input type="checkbox" value="Rural"> Rural</label>
+                    <label><input type="checkbox" value="Non-profit"> Non-profit</label>
+                    <label><input type="checkbox" value="For Profit"> For Profit</label>
+                    <label><input type="checkbox" value="Church Affiliated"> Church Affiliated</label>
+                    <label><input type="checkbox" value="Academic Medical Center"> Academic Medical Center</label>
+                    <label><input type="checkbox" value="Safety Net"> Safety Net</label>
+                </div>
+            </details>
+
+            <!-- Key Metric Categories -->
+            <details class="filter-section">
+                <summary>Refine by Metrics</summary>
+                <div class="filter-group">
+                    <label><input type="checkbox" value="Financial Transparency and Institutional Health"> Financial Transparency & Institutional Health</label>
+                    <label><input type="checkbox" value="Community Benefit Spending"> Community Benefit Spending</label>
+                    <label><input type="checkbox" value="Healthcare Affordability and Billing"> Healthcare Affordability & Billing</label>
+                    <label><input type="checkbox" value="Healthcare Access and Social Responsibility"> Healthcare Access & Social Responsibility</label>
+                </div>
+            </details>
+
+            <!-- Action Buttons -->
+            <div class="filter-actions">
+                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
+                <button id="resetFiltersBtn" type="reset" class="btn-secondary">Reset</button>
+                <button id="downloadDataBtn" class="btn-secondary">Download Data</button>
             </div>
-            <details class="submetric"><summary>Range of Services</summary><p>Assesses the breadth of essential services provided locally.</p></details>
-            <details class="submetric"><summary>Demographic Alignment</summary><p>Evaluates how well hospital demographics reflect the community it serves.</p></details>
-            <details class="submetric"><summary>Workforce Training</summary><p>Measures investment in training, certification, and education programs.</p></details>
-            <details class="submetric"><summary>Pay Equity Ratio</summary><p>Compares executive compensation to median employee pay for equity.</p></details>
-        </section>
-    </main>
+        </aside>
 
-    <!-- ===== Footer ===== -->
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <section class="search-section">
+                <div class="results-header">
+                    <span id="resultsCount" class="results-count">Viewing 0 results</span>
+                    <label for="sortSelect" class="sort-select-label">
+                        Sort by:
+                        <select id="sortSelect">
+                            <option value="grade">Grade (High to Low)</option>
+                            <option value="distance">Distance (Closest First)</option>
+                            <option value="name">Hospital Name (A-Z)</option>
+                            <option value="size">Bed Size (Small → Extra Large)</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="results-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th width="15%">Score</th>
+                                <th width="60%">Hospital Name & Location</th>
+                                <th width="25%">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hospitalResults">
+                            <!-- Results populated by JavaScript -->
+                            <tr>
+                                <td colspan="3" class="loading-message">Loading hospitals...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Map Column -->
+        <div class="map-column">
+            <section class="map-section">
+                <h2>HOSPITAL LOCATIONS</h2>
+                <div id="mainMap" class="map-container"></div>
+            </section>
+        </div>
+    </div>
+
     <footer>
-        <div class="container footer-content">
-            <ul class="footer-links">
-                <li><a href="#">Georgia Watch</a></li>
-                <li><a href="index.html">Rankings</a></li>
-                <li><a href="methodology.html">Methodology</a></li>
-                <li><a href="https://georgiawatch.org/about/">About Us</a></li>
-                <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
-                <li><a href="#">Legal/Privacy</a></li>
-            </ul>
-            <p>© 2024 Georgia Watch. All Rights Reserved.</p>
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="index.html">Georgia Watch</a></li>
+                    <li><a href="index.html">Rankings</a></li>
+                    <li><a href="methodology.html">Methodology</a></li>
+                    <li><a href="https://georgiawatch.org/about/">About Us</a></li>
+                    <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
+                    <li><a href="#">Legal/Privacy</a></li>
+                    <li><a href="#">Site Map</a></li>
+                </ul>
+                <div class="copyright">
+                    <p>Georgia Watch is a non-profit, nonpartisan 501(c)3 organization. © 2024 Georgia Watch. All Rights Reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/details.js"></script>
 </body>
 </html>
