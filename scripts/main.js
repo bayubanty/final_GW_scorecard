@@ -104,6 +104,7 @@ function initMobileEventListeners() {
     const mobileViewIndividualsBtn = document.getElementById('mobileViewIndividualsBtn');
     const mobileFilterCriticalBtn = document.getElementById('mobileFilterCriticalBtn');
     const mobileFilterAcuteBtn = document.getElementById('mobileFilterAcuteBtn');
+    const mobileCompareHospitalsBtn = document.getElementById('mobileCompareHospitalsBtn');
 
     if (mobileViewSystemsBtn) {
         mobileViewSystemsBtn.addEventListener('click', function() {
@@ -115,6 +116,13 @@ function initMobileEventListeners() {
     if (mobileViewIndividualsBtn) {
         mobileViewIndividualsBtn.addEventListener('click', function() {
             document.getElementById('viewIndividualsBtn').click();
+            syncMobileViewButtons();
+        });
+    }
+
+    if (mobileCompareHospitalsBtn) {
+        mobileCompareHospitalsBtn.addEventListener('click', function() {
+            document.getElementById('compareHospitalsBtn').click();
             syncMobileViewButtons();
         });
     }
@@ -140,8 +148,10 @@ function initMobileEventListeners() {
 function syncMobileViewButtons() {
     const viewSystemsBtn = document.getElementById('viewSystemsBtn');
     const viewIndividualsBtn = document.getElementById('viewIndividualsBtn');
+    const compareHospitalsBtn = document.getElementById('compareHospitalsBtn');
     const mobileViewSystemsBtn = document.getElementById('mobileViewSystemsBtn');
     const mobileViewIndividualsBtn = document.getElementById('mobileViewIndividualsBtn');
+    const mobileCompareHospitalsBtn = document.getElementById('mobileCompareHospitalsBtn');
     const individualOptions = document.getElementById('individualOptions');
     const mobileIndividualOptions = document.getElementById('mobileIndividualOptions');
 
@@ -149,11 +159,18 @@ function syncMobileViewButtons() {
         if (viewSystemsBtn.classList.contains('active')) {
             mobileViewSystemsBtn.classList.add('active');
             mobileViewIndividualsBtn.classList.remove('active');
+            mobileCompareHospitalsBtn.classList.remove('active');
             if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'none';
-        } else {
+        } else if (viewIndividualsBtn.classList.contains('active')) {
             mobileViewSystemsBtn.classList.remove('active');
             mobileViewIndividualsBtn.classList.add('active');
+            mobileCompareHospitalsBtn.classList.remove('active');
             if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'block';
+        } else if (compareHospitalsBtn.classList.contains('active')) {
+            mobileViewSystemsBtn.classList.remove('active');
+            mobileViewIndividualsBtn.classList.remove('active');
+            mobileCompareHospitalsBtn.classList.add('active');
+            if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'none';
         }
     }
 }
@@ -404,14 +421,46 @@ function renderHospitals(data) {
 // ===============================
 const viewSystemsBtn = document.getElementById('viewSystemsBtn');
 const viewIndividualsBtn = document.getElementById('viewIndividualsBtn');
+const compareHospitalsBtn = document.getElementById('compareHospitalsBtn');
 const individualOptions = document.getElementById('individualOptions');
 const filterCriticalBtn = document.getElementById('filterCriticalBtn');
 const filterAcuteBtn = document.getElementById('filterAcuteBtn');
+
+function deactivateAllViewButtons() {
+    viewSystemsBtn.classList.remove('active');
+    viewIndividualsBtn.classList.remove('active');
+    compareHospitalsBtn.classList.remove('active');
+}
 
 function deactivateHospitalTypeButtons() {
     filterCriticalBtn.classList.remove('active');
     filterAcuteBtn.classList.remove('active');
 }
+
+// View Systems toggle
+viewSystemsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    viewSystemsBtn.classList.add('active');
+    individualOptions.style.display = 'none';
+    applyAllFilters();
+});
+
+// View Individuals toggle
+viewIndividualsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    viewIndividualsBtn.classList.add('active');
+    individualOptions.style.display = 'block';
+    applyAllFilters();
+});
+
+// Compare Hospitals toggle
+compareHospitalsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    compareHospitalsBtn.classList.add('active');
+    individualOptions.style.display = 'none';
+    // Redirect to compare page
+    window.location.href = 'compare.html';
+});
 
 // Critical Access toggle
 filterCriticalBtn.addEventListener('click', () => {
@@ -439,20 +488,6 @@ function getSelectedHospitalType() {
     if (filterAcuteBtn.classList.contains('active')) return 'Acute Care';
     return null;
 }
-
-viewSystemsBtn.addEventListener('click', () => {
-    viewSystemsBtn.classList.add('active');
-    viewIndividualsBtn.classList.remove('active');
-    individualOptions.style.display = 'none';
-    applyAllFilters();
-});
-
-viewIndividualsBtn.addEventListener('click', () => {
-    viewIndividualsBtn.classList.add('active');
-    viewSystemsBtn.classList.remove('active');
-    individualOptions.style.display = 'block';
-    applyAllFilters();
-});
 
 // ===============================
 // Apply Location Button
@@ -576,6 +611,7 @@ function resetAllFilters() {
     document.getElementById('radiusSelect').selectedIndex = 0;
 
     // Reset view buttons
+    deactivateAllViewButtons();
     deactivateHospitalTypeButtons();
 
     // Reset to all data
@@ -788,25 +824,3 @@ function showErrorPopup(message) {
         setTimeout(() => popup.remove(), 400);
     }, 4000);
 }
-
-// ===============================
-// Compare Hospitals Functionality
-// ===============================
-
-// Add event listener for compare button
-document.addEventListener('DOMContentLoaded', function() {
-    const compareBtn = document.getElementById('compareHospitalsBtn');
-    if (compareBtn) {
-        compareBtn.addEventListener('click', function() {
-            window.location.href = 'compare.html';
-        });
-    }
-    
-    // Also add to mobile filter panel if it exists
-    const mobileCompareBtn = document.getElementById('mobileCompareHospitalsBtn');
-    if (mobileCompareBtn) {
-        mobileCompareBtn.addEventListener('click', function() {
-            window.location.href = 'compare.html';
-        });
-    }
-});
