@@ -13,26 +13,16 @@
         <div class="container">
             <div class="top-nav">
                 <div class="logo">
-                    <img src="images/logo2White.png" width="auto" height="60" alt="Georgia Watch Logo">
+                    <img src="images/logo2White.png" width="auto" height="80" />
                     <span>Georgia Watch</span>
                 </div>
-                
-                <!-- Desktop Navigation -->
-                <nav class="nav-links">
-                    <a href="index.html">Rankings</a>
+                <div class="nav-links">
+                    <a href="rankings.html">Rankings</a>
                     <a href="methodology.html">Methodology</a>
                     <a href="https://georgiawatch.org/about/">About Us</a>
                     <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
-                </nav>
-                
-                <!-- Mobile Navigation Toggle -->
-                <button class="mobile-nav-toggle" aria-label="Toggle navigation menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                </div>
             </div>
-            
             <div class="header-content">
                 <h1>GEORGIA WATCH</h1>
                 <p>Advocating for patients and protecting consumers since 2002</p>
@@ -40,42 +30,127 @@
         </div>
     </header>
 
-    <!-- Mobile Navigation Panel -->
-    <div class="mobile-nav-panel">
-        <div class="mobile-nav-header">
-            <div class="logo">
-                <img src="images/logo2White.png" width="auto" height="50" alt="Georgia Watch Logo">
-                <span>Georgia Watch</span>
-            </div>
-            <button class="mobile-nav-close" aria-label="Close navigation menu">×</button>
-        </div>
-        <nav class="mobile-nav-links">
-            <a href="index.html" class="active">Rankings</a>
-            <a href="methodology.html">Methodology</a>
-            <a href="https://georgiawatch.org/about/">About Us</a>
-            <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
-        </nav>
+    <!-- Mobile Header Controls - MOVED BELOW HEADER -->
+    <div class="mobile-header-controls">
+        <button class="mobile-nav-toggle">
+            <span>☰</span> Menu
+        </button>
+        <button class="mobile-filter-toggle">
+            <span>🔍</span> Filters & Search
+        </button>
     </div>
-    <div class="mobile-nav-overlay"></div>
 
-    <!-- Mobile Filters Button -->
-    <button class="mobile-filters-toggle">
-        <span>☰ Filters & Search</span>
-    </button>
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-panel">
+            <div class="mobile-nav-header">
+                <h3>Navigation</h3>
+                <button class="mobile-nav-close">×</button>
+            </div>
+            <div class="mobile-nav-links">
+                <a href="index.html">Rankings</a>
+                <a href="methodology.html">Methodology</a>
+                <a href="https://georgiawatch.org/about/">About Us</a>
+                <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Filter Panel -->
+    <div class="mobile-filter-overlay">
+        <div class="mobile-filter-panel">
+            <div class="mobile-filter-header">
+                <h3>Filters & Search</h3>
+                <button class="mobile-filter-close">×</button>
+            </div>
+            <div class="mobile-filter-content">
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <h3>View Results By:</h3>
+                    <div class="view-buttons">
+                        <button id="mobileViewSystemsBtn" class="toggle-btn">Hospital Systems</button>
+                        <button id="mobileViewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
+                    </div>
+                    <div id="mobileIndividualOptions" style="display: none; margin-top: 10px;">
+                        <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
+                        <div class="view-buttons">
+                            <button id="mobileFilterCriticalBtn" class="toggle-btn">Critical Access</button>
+                            <button id="mobileFilterAcuteBtn" class="toggle-btn">Acute Care</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Search -->
+                <div class="location-search">
+                    <h3>Location Search</h3>
+                    <label>
+                        Enter ZIP Code:
+                        <input type="text" id="mobileZipInput" placeholder="12345">
+                    </label>
+                    <br>
+                    <label>
+                        Radius:
+                        <select id="mobileRadiusSelect">
+                            <option value="5">5 miles</option>
+                            <option value="10">10 miles</option>
+                            <option value="15">15 miles</option>
+                            <option value="20">20 miles</option>
+                            <option value="25">25 miles</option>
+                            <option value="30">30 miles</option>
+                        </select>
+                    </label>
+                    <button id="mobileApplyLocationBtn">Apply Location</button>
+                </div>
+
+                <!-- Hospital Type -->
+                <details open>
+                    <summary>Refine by Hospital Type</summary>
+                    <div class="filter-group">
+                        <label><input type="checkbox" value="Urban"> Urban</label>
+                        <label><input type="checkbox" value="Rural"> Rural</label>
+                        <label><input type="checkbox" value="Non-profit"> Non-profit</label>
+                        <label><input type="checkbox" value="For Profit"> For Profit</label>
+                        <label><input type="checkbox" value="Church Affiliated"> Church Affiliated</label>
+                        <label><input type="checkbox" value="Academic Medical Center"> Academic Medical Center</label>
+                        <label><input type="checkbox" value="Safety Net"> Safety Net</label>
+                    </div>
+                </details>
+
+                <!-- Key Metric Categories -->
+                <details>
+                    <summary>Refine by Metrics</summary>
+                    <div class="filter-group">
+                        <label><input type="checkbox" value="Financial Transparency and Institutional Health"> Financial Transparency & Institutional Health</label>
+                        <label><input type="checkbox" value="Community Benefit Spending"> Community Benefit Spending</label>
+                        <label><input type="checkbox" value="Healthcare Affordability and Billing"> Healthcare Affordability & Billing</label>
+                        <label><input type="checkbox" value="Healthcare Access and Social Responsibility"> Healthcare Access & Social Responsibility</label>
+                    </div>
+                </details>
+
+                <!-- Action Buttons -->
+                <div class="filter-actions">
+                    <button id="mobileApplyFiltersBtn">Apply Filters</button>
+                    <button id="mobileResetFiltersBtn" type="reset">Reset</button>
+                    <button id="mobileDownloadDataBtn">Download Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Map Section -->
+    <section class="mobile-map-section">
+        <h2>HOSPITAL LOCATIONS</h2>
+        <div id="mobileMainMap"></div>
+    </section>
 
     <div class="main-content">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3>Filters</h3>
-                <button class="mobile-sidebar-close" aria-label="Close filters">×</button>
-            </div>
-
             <!-- View Toggle -->
             <div class="view-toggle">
                 <h3>View Results By:</h3>
                 <div class="view-buttons">
-                    <button id="viewSystemsBtn" class="toggle-btn active">Hospital Systems</button>
+                    <button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
                     <button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
                 </div>
                 <div id="individualOptions" style="display: none; margin-top: 10px;">
@@ -92,7 +167,7 @@
                 <h3>Location Search</h3>
                 <label>
                     Enter ZIP Code:
-                    <input type="text" id="zipInput" placeholder="12345" maxlength="5">
+                    <input type="text" id="zipInput" placeholder="12345">
                 </label>
                 <br>
                 <label>
@@ -110,7 +185,7 @@
             </div>
 
             <!-- Hospital Type -->
-            <details class="filter-section" open>
+            <details open>
                 <summary>Refine by Hospital Type</summary>
                 <div class="filter-group">
                     <label><input type="checkbox" value="Urban"> Urban</label>
@@ -124,7 +199,7 @@
             </details>
 
             <!-- Key Metric Categories -->
-            <details class="filter-section">
+            <details>
                 <summary>Refine by Metrics</summary>
                 <div class="filter-group">
                     <label><input type="checkbox" value="Financial Transparency and Institutional Health"> Financial Transparency & Institutional Health</label>
@@ -136,9 +211,9 @@
 
             <!-- Action Buttons -->
             <div class="filter-actions">
-                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
-                <button id="resetFiltersBtn" type="reset" class="btn-secondary">Reset</button>
-                <button id="downloadDataBtn" class="btn-secondary">Download Data</button>
+                <button id="applyFiltersBtn">Apply Filters</button>
+                <button id="resetFiltersBtn" type="reset">Reset</button>
+                <button id="downloadDataBtn">Download Data</button>
             </div>
         </aside>
 
@@ -146,7 +221,7 @@
         <main class="content-area">
             <section class="search-section">
                 <div class="results-header">
-                    <span id="resultsCount" class="results-count">Viewing 0 results</span>
+                    <span id="resultsCount">Viewing 0 results</span>
                     <label for="sortSelect" class="sort-select-label">
                         Sort by:
                         <select id="sortSelect">
@@ -157,31 +232,29 @@
                         </select>
                     </label>
                 </div>
-                <div class="results-container">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th width="15%">Score</th>
-                                <th width="60%">Hospital Name & Location</th>
-                                <th width="25%">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="hospitalResults">
-                            <!-- Results populated by JavaScript -->
-                            <tr>
-                                <td colspan="3" class="loading-message">Loading hospitals...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Score</th>
+                            <th width="70%">Hospital Name & Location</th>
+                            <th width="20%">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hospitalResults">
+                        <!-- Results populated by JavaScript -->
+                    </tbody>
+                </table>
             </section>
+
+            <!-- Dynamic details mount point -->
+            <div id="detailRoot" style="display:none;"></div>
         </main>
 
-        <!-- Map Column -->
+        <!-- Map Column (Sticky) -->
         <div class="map-column">
             <section class="map-section">
                 <h2>HOSPITAL LOCATIONS</h2>
-                <div id="mainMap" class="map-container"></div>
+                <div id="mainMap"></div>
             </section>
         </div>
     </div>
@@ -190,11 +263,11 @@
         <div class="container">
             <div class="footer-content">
                 <ul class="footer-links">
-                    <li><a href="index.html">Georgia Watch</a></li>
-                    <li><a href="index.html">Rankings</a></li>
-                    <li><a href="methodology.html">Methodology</a></li>
-                    <li><a href="https://georgiawatch.org/about/">About Us</a></li>
-                    <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
+                    <li><a href="#">Georgia Watch</a></li>
+                    <li><a href="#">Rankings</a></li>
+                    <li><a href="#">Methodology</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Donate</a></li>
                     <li><a href="#">Legal/Privacy</a></li>
                     <li><a href="#">Site Map</a></li>
                 </ul>
