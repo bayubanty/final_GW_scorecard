@@ -20,19 +20,65 @@ async function loadHospitalData() {
         const response = await fetch('./data/2025/2025_Lown_Index_GA.json');
         hospitalData = await response.json();
         console.log('Hospital data loaded for comparison:', hospitalData.length, 'hospitals');
+        populateHospitalDropdowns();
     } catch (error) {
         console.error('Error loading hospital data for comparison:', error);
     }
 }
 
-function initializeEventListeners() {
-    // Search functionality
-    document.getElementById('searchHospital1').addEventListener('input', (e) => {
-        handleSearch(e.target.value, 'hospital1');
+function populateHospitalDropdowns() {
+    const hospital1Select = document.getElementById('hospital1Select');
+    const hospital2Select = document.getElementById('hospital2Select');
+    
+    // Clear existing options except the first one
+    while (hospital1Select.options.length > 1) {
+        hospital1Select.remove(1);
+    }
+    while (hospital2Select.options.length > 1) {
+        hospital2Select.remove(1);
+    }
+    
+    // Sort hospitals by name for easier selection
+    const sortedHospitals = [...hospitalData].sort((a, b) => {
+        const nameA = a.Name || 'Unnamed Hospital';
+        const nameB = b.Name || 'Unnamed Hospital';
+        return nameA.localeCompare(nameB);
     });
     
-    document.getElementById('searchHospital2').addEventListener('input', (e) => {
-        handleSearch(e.target.value, 'hospital2');
+    // Populate dropdowns
+    sortedHospitals.forEach(hospital => {
+        const name = hospital.Name || 'Unnamed Hospital';
+        const location = `${hospital.City || ''}, ${hospital.State || ''}`;
+        const optionText = `${name} - ${location}`;
+        
+        const option1 = new Option(optionText, hospital.RECORD_ID);
+        const option2 = new Option(optionText, hospital.RECORD_ID);
+        
+        hospital1Select.add(option1);
+        hospital2Select.add(option2);
+    });
+}
+
+function initializeEventListeners() {
+    // Dropdown change events
+    document.getElementById('hospital1Select').addEventListener('change', (e) => {
+        const hospitalId = e.target.value;
+        if (hospitalId) {
+            const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+            selectHospital(hospital, 'hospital1');
+        } else {
+            clearHospitalSelection('hospital1');
+        }
+    });
+    
+    document.getElementById('hospital2Select').addEventListener('change', (e) => {
+        const hospitalId = e.target.value;
+        if (hospitalId) {
+            const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+            selectHospital(hospital, 'hospital2');
+        } else {
+            clearHospitalSelection('hospital2');
+        }
     });
 
     // Compare button
@@ -50,52 +96,17 @@ function initializeEventListeners() {
     });
 }
 
-function handleSearch(query, hospitalSlot) {
-    const resultsContainer = document.getElementById(`results${hospitalSlot.charAt(0).toUpperCase() + hospitalSlot.slice(1)}`);
-    
-    if (query.length < 2) {
-        resultsContainer.classList.remove('active');
-        return;
-    }
-    
-    const filteredHospitals = hospitalData.filter(hospital => 
-        hospital.Name.toLowerCase().includes(query.toLowerCase()) ||
-        hospital.City.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 10); // Limit to 10 results
-    
-    displaySearchResults(filteredHospitals, resultsContainer, hospitalSlot);
-    resultsContainer.classList.add('active');
-}
-
-function displaySearchResults(hospitals, container, hospitalSlot) {
-    container.innerHTML = '';
-    
-    if (hospitals.length === 0) {
-        container.innerHTML = '<div class="search-result-item">No hospitals found</div>';
-        return;
-    }
-    
-    hospitals.forEach(hospital => {
-        const resultItem = document.createElement('div');
-        resultItem.className = 'search-result-item';
-        resultItem.innerHTML = `
-            <div class="hospital-name">${hospital.Name || 'Unnamed Hospital'}</div>
-            <div class="hospital-location">${hospital.City || ''}, ${hospital.State || ''}</div>
-        `;
-        
-        resultItem.addEventListener('click', () => {
-            selectHospital(hospital, hospitalSlot);
-            container.classList.remove('active');
-            document.getElementById(`search${hospitalSlot.charAt(0).toUpperCase() + hospitalSlot.slice(1)}`).value = '';
-        });
-        
-        container.appendChild(resultItem);
-    });
-}
-
 function selectHospital(hospital, slot) {
     selectedHospitals[slot] = hospital;
     updateSelectedHospitalDisplay(hospital, slot);
+    updateCompareButton();
+}
+
+function clearHospitalSelection(slot) {
+    selectedHospitals[slot] = null;
+    const container = document.getElementById(`selected${slot.charAt(0).toUpperCase() + slot.slice(1)}`);
+    container.innerHTML = '<p class="placeholder">No hospital selected</p>';
+    container.classList.remove('hospital-selected');
     updateCompareButton();
 }
 
@@ -129,11 +140,9 @@ function clearSelection() {
     document.getElementById('selectedHospital1').classList.remove('hospital-selected');
     document.getElementById('selectedHospital2').classList.remove('hospital-selected');
     
-    // Clear search inputs and results
-    document.getElementById('searchHospital1').value = '';
-    document.getElementById('searchHospital2').value = '';
-    document.getElementById('resultsHospital1').classList.remove('active');
-    document.getElementById('resultsHospital2').classList.remove('active');
+    // Reset dropdowns
+    document.getElementById('hospital1Select').value = '';
+    document.getElementById('hospital2Select').value = '';
     
     updateCompareButton();
     backToSelection();
@@ -232,7 +241,7 @@ function createCategoryElement(category) {
     `;
     
     const content = document.createElement('div');
-    content.className = 'category-content';
+    content.className = 'category-content active'; // Start expanded
     
     const metricsGrid = document.createElement('div');
     metricsGrid.className = 'metrics-grid';
@@ -298,12 +307,3 @@ function getFormattedValue(hospital, metric) {
 function isGradeMetric(key) {
     return key.includes('GRADE');
 }
-
-// Close search results when clicking outside
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.search-box')) {
-        document.querySelectorAll('.search-results').forEach(container => {
-            container.classList.remove('active');
-        });
-    }
-});
