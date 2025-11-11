@@ -113,12 +113,16 @@ function clearHospitalSelection(slot) {
 function updateSelectedHospitalDisplay(hospital, slot) {
     const container = document.getElementById(`selected${slot.charAt(0).toUpperCase() + slot.slice(1)}`);
     const grade = hospital.TIER_1_GRADE_Lown_Composite || 'N/A';
+    const stars = convertGradeToStars(grade);
     
     container.innerHTML = `
         <div class="hospital-preview">
             <h4>${hospital.Name || 'Unnamed Hospital'}</h4>
             <div class="location">${hospital.City || ''}, ${hospital.State || ''}</div>
-            <div class="grade">Overall Grade: ${grade}</div>
+            <div class="grade">
+                Overall Grade: 
+                <div class="star-rating">${renderStars(stars.value)}</div>
+            </div>
         </div>
     `;
     container.classList.add('hospital-selected');
@@ -273,12 +277,20 @@ function createMetricRow(metric) {
         <div class="metric-divider">vs</div>
         <div class="metric-values">
             <div class="metric-value hospital-1-value">
-                <span class="metric-value-text">${hospital1Value}</span>
-                ${isGradeMetric(metric.key) ? `<span class="metric-grade grade-${selectedHospitals.hospital1[metric.key] || 'N/A'}">${selectedHospitals.hospital1[metric.key] || 'N/A'}</span>` : ''}
+                <div class="metric-value-content">
+                    ${isGradeMetric(metric.key) ? 
+                        `<div class="star-comparison">${renderStars(convertGradeToStars(selectedHospitals.hospital1[metric.key] || 'F').value)}</div>` : 
+                        `<span class="metric-value-text">${hospital1Value}</span>`
+                    }
+                </div>
             </div>
             <div class="metric-value hospital-2-value">
-                <span class="metric-value-text">${hospital2Value}</span>
-                ${isGradeMetric(metric.key) ? `<span class="metric-grade grade-${selectedHospitals.hospital2[metric.key] || 'N/A'}">${selectedHospitals.hospital2[metric.key] || 'N/A'}</span>` : ''}
+                <div class="metric-value-content">
+                    ${isGradeMetric(metric.key) ? 
+                        `<div class="star-comparison">${renderStars(convertGradeToStars(selectedHospitals.hospital2[metric.key] || 'F').value)}</div>` : 
+                        `<span class="metric-value-text">${hospital2Value}</span>`
+                    }
+                </div>
             </div>
         </div>
     `;
@@ -306,4 +318,63 @@ function getFormattedValue(hospital, metric) {
 
 function isGradeMetric(key) {
     return key.includes('GRADE');
+}
+
+// ===============================
+// Star Rating Utilities
+// ===============================
+function convertGradeToStars(grade) {
+    const gradeMap = {
+        'A+': 5, 'A': 5, 'A-': 4.5,
+        'B+': 4.5, 'B': 4, 'B-': 3.5,
+        'C+': 3.5, 'C': 3, 'C-': 2.5,
+        'D+': 2.5, 'D': 2, 'D-': 1.5,
+        'F': 1,
+    };
+    const value = gradeMap[grade.trim()] || 0;
+    return { value };
+}
+
+function renderStars(value) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        if (value >= i) {
+            html += fullStarSVG();
+        } else if (value >= i - 0.5) {
+            html += halfStarSVG();
+        } else {
+            html += emptyStarSVG();
+        }
+    }
+    return html;
+}
+
+function fullStarSVG() {
+    return `
+        <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
+    `;
+}
+
+function halfStarSVG() {
+    return `
+        <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+                <linearGradient id="halfGradient" x1="0" x2="1">
+                    <stop offset="50%" stop-color="#f48810" />
+                    <stop offset="50%" stop-color="#a4cc95" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
+    `;
+}
+
+function emptyStarSVG() {
+    return `
+        <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
+    `;
 }
