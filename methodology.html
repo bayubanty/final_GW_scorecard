@@ -7,49 +7,48 @@
     <link rel="stylesheet" href="styles/main.css" />
     <meta name="description" content="Learn about how Georgia Watch evaluates hospitals for transparency, affordability, and community benefit." />
 </head>
-<body class="methodology-page">
+<body>
     <!-- ===== Header ===== -->
     <header>
         <div class="container top-nav">
             <div class="logo">
-                <img src="images/logo2White.png" height="60" alt="Georgia Watch logo" />
+                <img src="images/logo2White.png" height="80" alt="Georgia Watch logo" />
                 <span>Georgia Watch</span>
             </div>
-            
-            <!-- Desktop Navigation -->
             <nav class="nav-links">
                 <a href="index.html">Rankings</a>
                 <a href="methodology.html" class="active">Methodology</a>
                 <a href="https://georgiawatch.org/about/">About Us</a>
                 <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
             </nav>
-            
-            <!-- Mobile Navigation Toggle -->
-            <button class="mobile-nav-toggle" aria-label="Toggle navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </header>
 
-    <!-- Mobile Navigation Panel -->
-    <div class="mobile-nav-panel">
-        <div class="mobile-nav-header">
-            <div class="logo">
-                <img src="images/logo2White.png" width="auto" height="50" alt="Georgia Watch Logo">
-                <span>Georgia Watch</span>
-            </div>
-            <button class="mobile-nav-close" aria-label="Close navigation menu">×</button>
-        </div>
-        <nav class="mobile-nav-links">
-            <a href="index.html">Rankings</a>
-            <a href="methodology.html" class="active">Methodology</a>
-            <a href="https://georgiawatch.org/about/">About Us</a>
-            <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
-        </nav>
+    <!-- Mobile Header Controls -->
+    <div class="mobile-header-controls">
+        <button class="mobile-nav-toggle">
+            <span>☰</span> Menu
+        </button>
+        <button class="mobile-filter-toggle" style="visibility: hidden;">
+            <span>🔍</span> Filters
+        </button>
     </div>
-    <div class="mobile-nav-overlay"></div>
+
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-panel">
+            <div class="mobile-nav-header">
+                <h3>Navigation</h3>
+                <button class="mobile-nav-close">×</button>
+            </div>
+            <div class="mobile-nav-links">
+                <a href="index.html">Rankings</a>
+                <a href="methodology.html">Methodology</a>
+                <a href="https://georgiawatch.org/about/">About Us</a>
+                <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== Hero Section ===== -->
     <section class="methodology-hero">
@@ -145,7 +144,7 @@
     <footer>
         <div class="container footer-content">
             <ul class="footer-links">
-                <li><a href="index.html">Georgia Watch</a></li>
+                <li><a href="#">Georgia Watch</a></li>
                 <li><a href="index.html">Rankings</a></li>
                 <li><a href="methodology.html">Methodology</a></li>
                 <li><a href="https://georgiawatch.org/about/">About Us</a></li>
