@@ -30,6 +30,40 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
 function initMobileUI() {
     // Initialize mobile event listeners
     initMobileEventListeners();
+    // Initialize mobile navigation
+    initMobileNavigation();
+}
+
+function initMobileNavigation() {
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const mobileNavClose = document.querySelector('.mobile-nav-close');
+    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+    
+    if (mobileNavToggle && mobileNavOverlay) {
+        mobileNavToggle.addEventListener('click', toggleMobileNavigation);
+        
+        if (mobileNavClose) {
+            mobileNavClose.addEventListener('click', toggleMobileNavigation);
+        }
+        
+        mobileNavOverlay.addEventListener('click', function(e) {
+            if (e.target === this) toggleMobileNavigation();
+        });
+    }
+}
+
+function toggleMobileNavigation() {
+    const body = document.body;
+    const overlay = document.querySelector('.mobile-nav-overlay');
+    const panel = document.querySelector('.mobile-nav-panel');
+    
+    if (!overlay || !panel) return;
+    
+    body.classList.toggle('mobile-nav-open');
+    overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
+    setTimeout(() => {
+        panel.classList.toggle('active');
+    }, 10);
 }
 
 function initMobileEventListeners() {
@@ -142,18 +176,6 @@ function syncMobileFilterButtons() {
             mobileFilterAcuteBtn.classList.remove('active');
         }
     }
-}
-
-function toggleMobileNavigation() {
-    const body = document.body;
-    const overlay = document.querySelector('.mobile-nav-overlay');
-    const panel = document.querySelector('.mobile-nav-panel');
-    
-    body.classList.toggle('mobile-nav-open');
-    overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
-    setTimeout(() => {
-        panel.classList.toggle('active');
-    }, 10);
 }
 
 function toggleMobileFilters() {
@@ -766,3 +788,25 @@ function showErrorPopup(message) {
         setTimeout(() => popup.remove(), 400);
     }, 4000);
 }
+
+// ===============================
+// Compare Hospitals Functionality
+// ===============================
+
+// Add event listener for compare button
+document.addEventListener('DOMContentLoaded', function() {
+    const compareBtn = document.getElementById('compareHospitalsBtn');
+    if (compareBtn) {
+        compareBtn.addEventListener('click', function() {
+            window.location.href = 'compare.html';
+        });
+    }
+    
+    // Also add to mobile filter panel if it exists
+    const mobileCompareBtn = document.getElementById('mobileCompareHospitalsBtn');
+    if (mobileCompareBtn) {
+        mobileCompareBtn.addEventListener('click', function() {
+            window.location.href = 'compare.html';
+        });
+    }
+});
