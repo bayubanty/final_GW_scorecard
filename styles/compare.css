@@ -111,13 +111,36 @@ Compare Page Styles
 }
 
 .hospital-preview .grade {
-    display: inline-block;
-    background: #f48810;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-weight: 600;
-    font-size: 0.9rem;
+}
+
+/* Star Ratings */
+.star-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.star {
+    width: 18px;
+    height: 18px;
+    fill: #a4cc95;
+}
+
+.star.full {
+    fill: #f48810;
+}
+
+.star.half {
+    fill: url(#halfGradient);
+}
+
+.star.empty {
+    fill: #ddd;
 }
 
 /* Compare Actions */
@@ -290,7 +313,7 @@ Compare Page Styles
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 12px;
     border-radius: 4px;
     background: #f8f9fa;
 }
@@ -303,29 +326,25 @@ Compare Page Styles
     border-left: 3px solid #f48810;
 }
 
+.metric-value-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .metric-value-text {
     font-weight: 600;
 }
 
-.metric-grade {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: white;
-}
-
-.grade-A { background: #28a745; }
-.grade-B { background: #17a2b8; }
-.grade-C { background: #ffc107; color: #000; }
-.grade-D { background: #fd7e14; }
-.grade-F { background: #dc3545; }
-
 .star-comparison {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 3px;
+}
+
+.star-comparison .star {
+    width: 16px;
+    height: 16px;
 }
 
 /* Responsive Design */
@@ -366,5 +385,15 @@ Compare Page Styles
     
     .metric-divider {
         display: none;
+    }
+    
+    .metric-value-content {
+        justify-content: center;
+    }
+    
+    .hospital-preview .grade {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
     }
 }
