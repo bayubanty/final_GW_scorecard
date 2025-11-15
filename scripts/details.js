@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const res = await fetch(".data/2025/2025-GW_HospitalScores.json");
+    const res = await fetch("./data/2025/2025-GW_HospitalScores.json");
     const data = await res.json();
 
     // Match flexible key names (handles spaces and case)
