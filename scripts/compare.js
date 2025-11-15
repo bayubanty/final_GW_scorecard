@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadHospitalData() {
     try {
-        const response = await fetch('.data/2025/2025-GW_HospitalScores.json');
+        const response = await fetch('./data/2025/2025-GW_HospitalScores.json');
         hospitalData = await response.json();
         console.log('Hospital data loaded for comparison:', hospitalData.length, 'hospitals');
         populateHospitalDropdowns();
