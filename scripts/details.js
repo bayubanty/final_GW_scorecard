@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         showLoading();
         console.log("Loading hospital details for ID:", hospitalId);
         
-        const response = await fetch("./data/2025/2025-GW_HospitalScores.json");
+        const response = await fetch("./data/2025/2025_GW_HospitalScores.json");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const data = await response.json();
