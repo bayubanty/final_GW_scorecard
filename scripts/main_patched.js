@@ -17,7 +17,7 @@ let hospitalData = [];
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("./data/2025/2025_Lown_Index_GA.json")
+fetch("./data/2025/2025-GW_HospitalScores.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
