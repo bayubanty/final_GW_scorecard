@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const res = await fetch("./data/2025/2025_Lown_Index_GA.json");
+    const res = await fetch(".data/2025/2025-GW_HospitalScores.json");
     const data = await res.json();
 
     // Match flexible key names (handles spaces and case)
@@ -52,11 +52,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 	  // ===== Bed Size / Hospital Size =====
 	  hospitalSize: (() => {
 		const sizeMap = {
-		  xs: "Extra Small",
-		  s: "Small",
-		  m: "Medium",
-		  l: "Large",
-		  xl: "Extra Large"
+		  XS: "Extra Small",
+		  S: "Small",
+		  M: "Medium",
+		  L: "Large",
+		  XL: "Extra Large"
 		};
 		const sizeKey = String(h.Size || "").toLowerCase().trim();
 		return sizeMap[sizeKey] || "—";
