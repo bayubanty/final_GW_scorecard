@@ -1,6 +1,6 @@
 let hospitalsData = [];
 
-fetch('./data/2025/2025-GW_HospitalScores.json')
+fetch('./data/2025/2025_GW_HospitalScores.json')
   .then(response => response.json())
   .then(data => {
     hospitalsData = data;
