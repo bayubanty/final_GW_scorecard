@@ -1,6 +1,6 @@
 // ===============================
-// Hospital Comparison Script
-// Enhanced data mapping for comparison
+// Hospital Comparison Script 
+// Robust data mapping for comparison features
 // ===============================
 
 let hospitalData = [];
@@ -11,6 +11,7 @@ let selectedHospitals = {
 
 // Load hospital data
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("Initializing hospital comparison...");
     loadHospitalData();
     initializeEventListeners();
     initMobileNavigation();
@@ -19,54 +20,117 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadHospitalData() {
     try {
         const response = await fetch('./data/2025/2025-GW_HospitalScores.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         hospitalData = await response.json();
         console.log('Hospital data loaded for comparison:', hospitalData.length, 'hospitals');
         populateHospitalDropdowns();
+        
     } catch (error) {
         console.error('Error loading hospital data for comparison:', error);
         showComparisonError('Failed to load hospital data. Please refresh the page.');
     }
 }
 
+// ===============================
+// Flexible Data Access Utilities
+// ===============================
+
+function getHospitalField(hospital, possibleFields, defaultValue = '---') {
+    if (!hospital) return defaultValue;
+    
+    for (const field of possibleFields) {
+        const value = hospital[field];
+        if (value !== undefined && value !== null && value !== '' && value !== 'NULL') {
+            return value;
+        }
+    }
+    return defaultValue;
+}
+
+function getHospitalName(hospital) {
+    return getHospitalField(hospital, [
+        'Name', 'HospitalName', 'HOSPITAL_NAME', 'Hospital_Name', 
+        'name', 'hospital_name', 'FacilityName', 'facility_name'
+    ], 'Unnamed Hospital');
+}
+
+function getHospitalId(hospital) {
+    return getHospitalField(hospital, [
+        'RECORD_ID', 'RecordID', 'record_id', 'ID', 'id', 'HospitalID', 'hospital_id'
+    ]);
+}
+
+function getHospitalGrade(hospital, gradeType = 'overall') {
+    const gradeFields = {
+        'overall': ['TIER_1_GRADE_Lown_Composite', 'Overall_Grade', 'Grade', 'grade', 'OverallGrade'],
+        'outcome': ['TIER_2_GRADE_Outcome', 'Outcome_Grade', 'Outcome'],
+        'value': ['TIER_2_GRADE_Value', 'Value_Grade', 'Value'],
+        'civic': ['TIER_2_GRADE_Civic', 'Civic_Grade', 'Civic'],
+        'safety': ['TIER_3_GRADE_Pat_Saf', 'Safety_Grade', 'Safety'],
+        'experience': ['TIER_3_GRADE_Pat_Exp', 'Experience_Grade', 'Experience'],
+        'cost': ['TIER_3_GRADE_Cost_Eff', 'Cost_Grade', 'Cost'],
+        'executive': ['TIER_3_GRADE_Exec_Comp', 'Executive_Grade', 'Executive'],
+        'community': ['TIER_3_GRADE_CB', 'Community_Grade', 'Community'],
+        'inclusivity': ['TIER_3_GRADE_Inclusivity', 'Inclusivity_Grade', 'Inclusivity']
+    };
+    
+    const fields = gradeFields[gradeType] || gradeFields['overall'];
+    return getHospitalField(hospital, fields, 'N/A');
+}
+
+// ===============================
+// Dropdown Population
+// ===============================
+
 function populateHospitalDropdowns() {
     const hospital1Select = document.getElementById('hospital1Select');
     const hospital2Select = document.getElementById('hospital2Select');
 
+    if (!hospital1Select || !hospital2Select) {
+        console.error('Hospital dropdown elements not found');
+        return;
+    }
+
     // Clear existing options except the first one
-    while (hospital1Select.options.length > 1) {
-        hospital1Select.remove(1);
-    }
-    while (hospital2Select.options.length > 1) {
-        hospital2Select.remove(1);
-    }
+    while (hospital1Select.options.length > 1) hospital1Select.remove(1);
+    while (hospital2Select.options.length > 1) hospital2Select.remove(1);
 
     // Sort hospitals by name for easier selection
     const sortedHospitals = [...hospitalData].sort((a, b) => {
-        const nameA = a.Name || 'Unnamed Hospital';
-        const nameB = b.Name || 'Unnamed Hospital';
+        const nameA = getHospitalName(a);
+        const nameB = getHospitalName(b);
         return nameA.localeCompare(nameB);
     });
 
     // Populate dropdowns
     sortedHospitals.forEach(hospital => {
-        const name = hospital.Name || 'Unnamed Hospital';
-        const location = `${hospital.City || ''}, ${hospital.State || ''}`;
-        const optionText = `${name} - ${location}`;
+        const name = getHospitalName(hospital);
+        const city = getHospitalField(hospital, ['City', 'city'], '');
+        const state = getHospitalField(hospital, ['State', 'state'], '');
+        const location = `${city}, ${state}`.replace(', ,', ',').replace(/^, |, $/g, '').trim();
+        const optionText = location ? `${name} - ${location}` : name;
         
-        const option1 = new Option(optionText, hospital.RECORD_ID);
-        const option2 = new Option(optionText, hospital.RECORD_ID);
+        const option1 = new Option(optionText, getHospitalId(hospital));
+        const option2 = new Option(optionText, getHospitalId(hospital));
         
         hospital1Select.add(option1);
         hospital2Select.add(option2);
     });
+
+    console.log(`Populated dropdowns with ${sortedHospitals.length} hospitals`);
 }
+
+// ===============================
+// Event Listeners
+// ===============================
 
 function initializeEventListeners() {
     // Dropdown change events
     document.getElementById('hospital1Select').addEventListener('change', (e) => {
         const hospitalId = e.target.value;
         if (hospitalId) {
-            const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+            const hospital = hospitalData.find(h => getHospitalId(h) == hospitalId);
             selectHospital(hospital, 'hospital1');
         } else {
             clearHospitalSelection('hospital1');
@@ -76,29 +140,22 @@ function initializeEventListeners() {
     document.getElementById('hospital2Select').addEventListener('change', (e) => {
         const hospitalId = e.target.value;
         if (hospitalId) {
-            const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+            const hospital = hospitalData.find(h => getHospitalId(h) == hospitalId);
             selectHospital(hospital, 'hospital2');
         } else {
             clearHospitalSelection('hospital2');
         }
     });
 
-    // Compare button
+    // Action buttons
     document.getElementById('compareNowBtn').addEventListener('click', compareHospitals);
-
-    // Clear selection
     document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
-
-    // Back to selection
     document.getElementById('backToSelectionBtn').addEventListener('click', backToSelection);
-
-    // Category toggles
-    document.querySelectorAll('.category-header').forEach(header => {
-        header.addEventListener('click', toggleCategory);
-    });
 }
 
 function selectHospital(hospital, slot) {
+    if (!hospital) return;
+    
     selectedHospitals[slot] = hospital;
     updateSelectedHospitalDisplay(hospital, slot);
     updateCompareButton();
@@ -107,20 +164,27 @@ function selectHospital(hospital, slot) {
 function clearHospitalSelection(slot) {
     selectedHospitals[slot] = null;
     const container = document.getElementById(`selected${slot.charAt(0).toUpperCase() + slot.slice(1)}`);
-    container.innerHTML = '<p class="placeholder">No hospital selected</p>';
-    container.classList.remove('hospital-selected');
+    if (container) {
+        container.innerHTML = '<p class="placeholder">No hospital selected</p>';
+        container.classList.remove('hospital-selected');
+    }
     updateCompareButton();
 }
 
 function updateSelectedHospitalDisplay(hospital, slot) {
     const container = document.getElementById(`selected${slot.charAt(0).toUpperCase() + slot.slice(1)}`);
-    const grade = hospital.TIER_1_GRADE_Lown_Composite || hospital.Overall_Grade || 'N/A';
+    if (!container) return;
+
+    const hospitalName = getHospitalName(hospital);
+    const city = getHospitalField(hospital, ['City', 'city'], '');
+    const state = getHospitalField(hospital, ['State', 'state'], '');
+    const grade = getHospitalGrade(hospital, 'overall');
     const stars = convertGradeToStars(grade);
 
     container.innerHTML = `
         <div class="hospital-preview">
-            <h4>${hospital.Name || 'Unnamed Hospital'}</h4>
-            <div class="location">${hospital.City || ''}, ${hospital.State || ''}</div>
+            <h4>${hospitalName}</h4>
+            <div class="location">${city}${city && state ? ', ' : ''}${state}</div>
             <div class="type">${getHospitalTypeShort(hospital)} • ${getUrbanRuralShort(hospital)}</div>
             <div class="grade">
                 Overall Grade:
@@ -133,8 +197,10 @@ function updateSelectedHospitalDisplay(hospital, slot) {
 
 function updateCompareButton() {
     const compareBtn = document.getElementById('compareNowBtn');
-    const hasBothHospitals = selectedHospitals.hospital1 && selectedHospitals.hospital2;
-    compareBtn.disabled = !hasBothHospitals;
+    if (compareBtn) {
+        const hasBothHospitals = selectedHospitals.hospital1 && selectedHospitals.hospital2;
+        compareBtn.disabled = !hasBothHospitals;
+    }
 }
 
 function clearSelection() {
@@ -142,10 +208,13 @@ function clearSelection() {
     selectedHospitals.hospital2 = null;
 
     // Reset displays
-    document.getElementById('selectedHospital1').innerHTML = '<p class="placeholder">No hospital selected</p>';
-    document.getElementById('selectedHospital2').innerHTML = '<p class="placeholder">No hospital selected</p>';
-    document.getElementById('selectedHospital1').classList.remove('hospital-selected');
-    document.getElementById('selectedHospital2').classList.remove('hospital-selected');
+    ['Hospital1', 'Hospital2'].forEach(slot => {
+        const container = document.getElementById(`selected${slot}`);
+        if (container) {
+            container.innerHTML = '<p class="placeholder">No hospital selected</p>';
+            container.classList.remove('hospital-selected');
+        }
+    });
 
     // Reset dropdowns
     document.getElementById('hospital1Select').value = '';
@@ -159,27 +228,32 @@ function compareHospitals() {
     if (!selectedHospitals.hospital1 || !selectedHospitals.hospital2) return;
 
     // Hide selection section, show results
-    document.querySelector('.selection-section').style.display = 'none';
-    document.getElementById('comparisonResults').style.display = 'block';
+    const selectionSection = document.querySelector('.selection-section');
+    const resultsSection = document.getElementById('comparisonResults');
+    
+    if (selectionSection) selectionSection.style.display = 'none';
+    if (resultsSection) resultsSection.style.display = 'block';
 
     // Populate comparison
     populateComparison();
 }
 
 function backToSelection() {
-    document.querySelector('.selection-section').style.display = 'block';
-    document.getElementById('comparisonResults').style.display = 'none';
+    const selectionSection = document.querySelector('.selection-section');
+    const resultsSection = document.getElementById('comparisonResults');
+    
+    if (selectionSection) selectionSection.style.display = 'block';
+    if (resultsSection) resultsSection.style.display = 'none';
 }
 
-function toggleCategory(event) {
-    const header = event.currentTarget;
-    const content = header.nextElementSibling;
-    header.classList.toggle('active');
-    content.classList.toggle('active');
-}
+// ===============================
+// Comparison Display
+// ===============================
 
 function populateComparison() {
     const comparisonGrid = document.getElementById('comparisonGrid');
+    if (!comparisonGrid) return;
+
     comparisonGrid.innerHTML = '';
 
     // Define comparison categories and metrics
@@ -187,58 +261,45 @@ function populateComparison() {
         {
             name: 'Overall Performance',
             metrics: [
-                { key: 'TIER_1_GRADE_Lown_Composite', label: 'Overall Grade' },
-                { key: 'Size', label: 'Hospital Size', format: (val) => getHospitalSize(val) },
-                { key: 'TYPE_NonProfit', label: 'Hospital Type', format: (val, hospital) => getHospitalTypeShort(hospital) },
-                { key: 'TYPE_urban', label: 'Setting', format: (val, hospital) => getUrbanRuralShort(hospital) },
-                { key: 'Beds', label: 'Bed Count', format: (val) => val || '---' }
+                { key: 'overall', label: 'Overall Grade', isGrade: true },
+                { key: 'size', label: 'Hospital Size', format: getHospitalSize },
+                { key: 'type', label: 'Hospital Type', format: getHospitalTypeShort },
+                { key: 'setting', label: 'Setting', format: getUrbanRuralShort },
+                { key: 'beds', label: 'Bed Count', format: (hospital) => getHospitalField(hospital, ['Beds', 'Bed_Count', 'beds']) }
             ]
         },
         {
             name: 'Financial Transparency & Institutional Health',
             metrics: [
-                { key: 'TIER_2_GRADE_Value', label: 'Value Grade' },
-                { key: 'TIER_3_GRADE_Exec_Comp', label: 'Executive Compensation Grade' },
-                { key: 'Financial_Transparency_Score', label: 'Financial Transparency Score', format: (val) => val || '---' }
+                { key: 'value', label: 'Value Grade', isGrade: true },
+                { key: 'executive', label: 'Executive Compensation Grade', isGrade: true }
             ]
         },
         {
             name: 'Community Benefit Spending',
             metrics: [
-                { key: 'TIER_3_GRADE_CB', label: 'Community Benefit Grade' },
-                { key: 'Community_Benefit_Spending', label: 'Community Benefit Spending', format: (val) => val ? `$${val}` : '---' }
+                { key: 'community', label: 'Community Benefit Grade', isGrade: true }
             ]
         },
         {
             name: 'Healthcare Affordability & Billing',
             metrics: [
-                { key: 'TIER_3_GRADE_Cost_Eff', label: 'Cost Effectiveness Grade' },
-                { key: 'Affordability_Score', label: 'Affordability Score', format: (val) => val || '---' }
+                { key: 'cost', label: 'Cost Effectiveness Grade', isGrade: true }
             ]
         },
         {
             name: 'Healthcare Access & Social Responsibility',
             metrics: [
-                { key: 'TIER_3_GRADE_Inclusivity', label: 'Inclusivity Grade' },
-                { key: 'TIER_2_GRADE_Civic', label: 'Civic Leadership Grade' },
-                { key: 'Access_Score', label: 'Access Score', format: (val) => val || '---' }
+                { key: 'inclusivity', label: 'Inclusivity Grade', isGrade: true },
+                { key: 'civic', label: 'Civic Leadership Grade', isGrade: true }
             ]
         },
         {
             name: 'Patient Outcomes & Experience',
             metrics: [
-                { key: 'TIER_2_GRADE_Outcome', label: 'Outcome Grade' },
-                { key: 'TIER_3_GRADE_Pat_Saf', label: 'Patient Safety Grade' },
-                { key: 'TIER_3_GRADE_Pat_Exp', label: 'Patient Experience Grade' }
-            ]
-        },
-        {
-            name: 'Hospital Information',
-            metrics: [
-                { key: 'County', label: 'County', format: (val) => val || '---' },
-                { key: 'HOSPITAL_SYSTEM', label: 'System Affiliation', format: (val) => val ? 'Part of System' : 'Independent' },
-                { key: 'TYPE_AMC', label: 'Academic Medical Center', format: (val) => val ? 'Yes' : 'No' },
-                { key: 'TYPE_isSafetyNet', label: 'Safety Net Hospital', format: (val) => val ? 'Yes' : 'No' }
+                { key: 'outcome', label: 'Outcome Grade', isGrade: true },
+                { key: 'safety', label: 'Patient Safety Grade', isGrade: true },
+                { key: 'experience', label: 'Patient Experience Grade', isGrade: true }
             ]
         }
     ];
@@ -246,6 +307,11 @@ function populateComparison() {
     categories.forEach(category => {
         const categoryElement = createCategoryElement(category);
         comparisonGrid.appendChild(categoryElement);
+    });
+
+    // Add click events for category toggles
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', toggleCategory);
     });
 }
 
@@ -275,15 +341,17 @@ function createCategoryElement(category) {
     categoryDiv.appendChild(header);
     categoryDiv.appendChild(content);
 
-    // Add click event for toggle
-    header.addEventListener('click', toggleCategory);
-
     return categoryDiv;
 }
 
 function createMetricRow(metric) {
-    const hospital1Value = getFormattedValue(selectedHospitals.hospital1, metric);
-    const hospital2Value = getFormattedValue(selectedHospitals.hospital2, metric);
+    const hospital1 = selectedHospitals.hospital1;
+    const hospital2 = selectedHospitals.hospital2;
+
+    if (!hospital1 || !hospital2) return null;
+
+    const hospital1Value = getFormattedValue(hospital1, metric);
+    const hospital2Value = getFormattedValue(hospital2, metric);
 
     // Skip if both values are unavailable
     if ((hospital1Value === 'N/A' || hospital1Value === '---') && 
@@ -294,24 +362,22 @@ function createMetricRow(metric) {
     const metricRow = document.createElement('div');
     metricRow.className = 'metric-row';
 
-    const isGradeMetric = isGradeField(metric.key);
-
     metricRow.innerHTML = `
         <div class="metric-name">${metric.label}</div>
         <div class="metric-divider">vs</div>
         <div class="metric-values">
             <div class="metric-value hospital-1-value">
                 <div class="metric-value-content">
-                    ${isGradeMetric ? 
-                        `<div class="star-comparison">${renderStars(convertGradeToStars(selectedHospitals.hospital1[metric.key] || 'N/A').value)}</div>` :
+                    ${metric.isGrade ? 
+                        `<div class="star-comparison">${renderStars(convertGradeToStars(hospital1Value).value)}</div>` :
                         `<span class="metric-value-text">${hospital1Value}</span>`
                     }
                 </div>
             </div>
             <div class="metric-value hospital-2-value">
                 <div class="metric-value-content">
-                    ${isGradeMetric ? 
-                        `<div class="star-comparison">${renderStars(convertGradeToStars(selectedHospitals.hospital2[metric.key] || 'N/A').value)}</div>` :
+                    ${metric.isGrade ? 
+                        `<div class="star-comparison">${renderStars(convertGradeToStars(hospital2Value).value)}</div>` :
                         `<span class="metric-value-text">${hospital2Value}</span>`
                     }
                 </div>
@@ -323,25 +389,24 @@ function createMetricRow(metric) {
 }
 
 function getFormattedValue(hospital, metric) {
-    const value = hospital[metric.key];
+    if (!hospital) return 'N/A';
     
     if (metric.format) {
-        return metric.format(value, hospital);
+        return metric.format(hospital);
     }
     
-    if (value === null || value === undefined || value === 'NULL' || value === '') {
-        return 'N/A';
+    if (metric.isGrade) {
+        return getHospitalGrade(hospital, metric.key);
     }
     
-    if (isGradeField(metric.key)) {
-        return value;
-    }
-    
-    return value;
+    return 'N/A';
 }
 
-function isGradeField(key) {
-    return key.includes('GRADE') || key.includes('_Grade');
+function toggleCategory(event) {
+    const header = event.currentTarget;
+    const content = header.nextElementSibling;
+    header.classList.toggle('active');
+    content.classList.toggle('active');
 }
 
 // ===============================
@@ -349,21 +414,28 @@ function isGradeField(key) {
 // ===============================
 
 function getHospitalTypeShort(hospital) {
-    if (hospital.TYPE_HospTyp_CAH || hospital["Critical Access"]) return "Critical Access";
-    if (hospital.TYPE_HospTyp_ACH || hospital["Acute Care"]) return "Acute Care";
-    if (hospital.TYPE_AMC || hospital["Academic Medical Center"]) return "Academic";
-    if (hospital.TYPE_NonProfit || hospital.Nonprofit) return "Nonprofit";
-    if (hospital.TYPE_ForProfit || hospital["For Profit"]) return "For-Profit";
+    if (!hospital) return "Hospital";
+    
+    if (getHospitalField(hospital, ['TYPE_HospTyp_CAH', 'Critical_Access'])) return "Critical Access";
+    if (getHospitalField(hospital, ['TYPE_HospTyp_ACH', 'Acute_Care'])) return "Acute Care";
+    if (getHospitalField(hospital, ['TYPE_AMC', 'Academic_Medical_Center'])) return "Academic";
+    if (getHospitalField(hospital, ['TYPE_NonProfit', 'Nonprofit'])) return "Nonprofit";
+    if (getHospitalField(hospital, ['TYPE_ForProfit', 'For_Profit'])) return "For-Profit";
+    
     return "Hospital";
 }
 
 function getUrbanRuralShort(hospital) {
-    if (hospital.TYPE_urban || hospital.Urban) return "Urban";
-    if (hospital.TYPE_rural || hospital.Rural) return "Rural";
+    if (!hospital) return "---";
+    
+    if (getHospitalField(hospital, ['TYPE_urban', 'Urban'])) return "Urban";
+    if (getHospitalField(hospital, ['TYPE_rural', 'Rural'])) return "Rural";
+    
     return "---";
 }
 
-function getHospitalSize(size) {
+function getHospitalSize(hospital) {
+    const size = getHospitalField(hospital, ['Size', 'size']);
     const sizeMap = {
         'xs': 'Extra Small', 's': 'Small', 'm': 'Medium', 'l': 'Large', 'xl': 'Extra Large',
         'extra small': 'Extra Small', 'small': 'Small', 'medium': 'Medium', 'large': 'Large', 'extra large': 'Extra Large'
@@ -377,10 +449,8 @@ function getHospitalSize(size) {
 
 function convertGradeToStars(grade) {
     const gradeMap = {
-        'A+': 5, 'A': 5, 'A-': 4.5,
-        'B+': 4.5, 'B': 4, 'B-': 3.5,
-        'C+': 3.5, 'C': 3, 'C-': 2.5,
-        'D+': 2.5, 'D': 2, 'D-': 1.5,
+        'A+': 5, 'A': 5, 'A-': 4.5, 'B+': 4.5, 'B': 4, 'B-': 3.5,
+        'C+': 3.5, 'C': 3, 'C-': 2.5, 'D+': 2.5, 'D': 2, 'D-': 1.5,
         'F': 1, 'N/A': 0
     };
     const value = gradeMap[String(grade).trim()] || 0;
@@ -390,13 +460,9 @@ function convertGradeToStars(grade) {
 function renderStars(value) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
-        if (value >= i) {
-            html += fullStarSVG();
-        } else if (value >= i - 0.5) {
-            html += halfStarSVG();
-        } else {
-            html += emptyStarSVG();
-        }
+        if (value >= i) html += fullStarSVG();
+        else if (value >= i - 0.5) html += halfStarSVG();
+        else html += emptyStarSVG();
     }
     return html;
 }
