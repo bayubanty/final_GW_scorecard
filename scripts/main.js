@@ -18,7 +18,7 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
         renderHospitals(hospitalData);
         initHospitalMap(hospitalData);
         initMobileMap(hospitalData);
-        
+
         // Initialize mobile UI
         initMobileUI();
     })
@@ -38,14 +38,12 @@ function initMobileNavigation() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNavClose = document.querySelector('.mobile-nav-close');
     const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
-    
+
     if (mobileNavToggle && mobileNavOverlay) {
         mobileNavToggle.addEventListener('click', toggleMobileNavigation);
-        
         if (mobileNavClose) {
             mobileNavClose.addEventListener('click', toggleMobileNavigation);
         }
-        
         mobileNavOverlay.addEventListener('click', function(e) {
             if (e.target === this) toggleMobileNavigation();
         });
@@ -56,9 +54,9 @@ function toggleMobileNavigation() {
     const body = document.body;
     const overlay = document.querySelector('.mobile-nav-overlay');
     const panel = document.querySelector('.mobile-nav-panel');
-    
+
     if (!overlay || !panel) return;
-    
+
     body.classList.toggle('mobile-nav-open');
     overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
     setTimeout(() => {
@@ -199,12 +197,11 @@ function toggleMobileFilters() {
     const body = document.body;
     const overlay = document.querySelector('.mobile-filter-overlay');
     const panel = document.querySelector('.mobile-filter-panel');
-    
+
     body.classList.toggle('mobile-filter-open');
     overlay.style.display = body.classList.contains('mobile-filter-open') ? 'block' : 'none';
     setTimeout(() => {
         panel.classList.toggle('active');
-        
         // Sync button states when opening
         if (body.classList.contains('mobile-filter-open')) {
             syncMobileViewButtons();
@@ -218,7 +215,7 @@ function syncFilterInputs() {
     // Sync checkbox states between mobile and desktop
     const desktopCheckboxes = document.querySelectorAll('.sidebar input[type="checkbox"]');
     const mobileCheckboxes = document.querySelectorAll('.mobile-filter-content input[type="checkbox"]');
-    
+
     desktopCheckboxes.forEach((checkbox, index) => {
         if (mobileCheckboxes[index]) {
             mobileCheckboxes[index].checked = checkbox.checked;
@@ -234,6 +231,7 @@ function syncFilterInputs() {
     if (zipInput && mobileZipInput) {
         mobileZipInput.value = zipInput.value;
     }
+
     if (radiusSelect && mobileRadiusSelect) {
         mobileRadiusSelect.value = radiusSelect.value;
     }
@@ -372,7 +370,7 @@ function renderHospitals(data) {
             if (hospital.RECORD_ID) {
                 window.location.href = `details.html?id=${hospital.RECORD_ID}`;
             } else {
-                showErrorPopup('Sorry, we couldn\'t find more details for this hospital.');
+                showErrorPopup('Sorry, we couldn\\'t find more details for this hospital.');
             }
         });
 
@@ -667,6 +665,7 @@ function initHospitalMap(data) {
 
 function updateMapMarkers(data) {
     console.log('Updating map markers with', data.length, 'hospitals');
+
     // Clear old markers
     mapMarkers.forEach(marker => map.removeLayer(marker));
     mapMarkers = [];
@@ -680,6 +679,7 @@ function updateMapMarkers(data) {
     data.forEach(hospital => {
         let lat = parseFloat(hospital.Latitude);
         let lon = parseFloat(hospital.Longitude);
+
         // If no coordinates, approximate from ZIP code
         if ((!lat || !lon) && hospital.Zip) {
             [lat, lon] = getZipCoords(hospital.Zip);
@@ -709,6 +709,7 @@ function updateMapMarkers(data) {
     });
 
     console.log('Added', mapMarkers.length, 'markers to map');
+
     // Adjust map to fit all visible markers
     if (mapMarkers.length > 0) {
         const group = L.featureGroup(mapMarkers);
@@ -824,6 +825,3 @@ function showErrorPopup(message) {
         setTimeout(() => popup.remove(), 400);
     }, 4000);
 }
-
-
-
