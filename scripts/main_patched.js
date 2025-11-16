@@ -17,28 +17,20 @@ let hospitalData = [];
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("./data/2025/2025_GW_HospitalScores.json")
-  .then(res => {
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    return res.json();
-  })
+fetch("./data/2025/2025_Lown_Index_GA.json")
+  .then(res => res.json())
   .then(data => {
     hospitalData = data;
     console.log("Hospital data loaded:", hospitalData.length, "records");
+
     // Initial render
     renderHospitals(hospitalData);
   })
-  .catch(err => {
-    console.error("Error loading JSON:", err);
-    showErrorPopup("Unable to load hospital data. Please try again later.");
-  });
+  .catch(err => console.error("Error loading JSON:", err));
 
 // ===============================
 // Render Hospitals
 // ===============================
-
 function showHospitalDetails(hospital, container) {
   // Determine grade class for color coding
   const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
@@ -54,6 +46,7 @@ function showHospitalDetails(hospital, container) {
         <p><strong>Location:</strong> ${hospital.TYPE_urban ? 'Urban' : 'Rural'}</p>
         <p><strong>County Income:</strong> ${hospital.county_income_shrt || 'N/A'}</p>
       </div>
+
       <div class="details-section">
         <h4>Key Metrics</h4>
         <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
@@ -68,6 +61,7 @@ function showHospitalDetails(hospital, container) {
     </div>
   `;
 }
+
 
 function renderHospitals(data) {
   const resultsTable = document.getElementById("hospitalResults");
@@ -84,8 +78,9 @@ function renderHospitals(data) {
     return;
   }
 
-  data.forEach(hospital => {
+data.forEach(hospital => {
     const row = document.createElement("tr");
+
     row.innerHTML = `
       <td>${hospital.TIER_1_GRADE_Lown_Composite || "N/A"}</td>
       <td>
@@ -96,6 +91,7 @@ function renderHospitals(data) {
         <a href="?id=${hospital.RECORD_ID}" class="details-button">View Details</a>
       </td>
     `;
+
     resultsTable.appendChild(row);
   });
 }
@@ -103,6 +99,7 @@ function renderHospitals(data) {
 const viewSystemsBtn = document.getElementById("viewSystemsBtn");
 const viewIndividualsBtn = document.getElementById("viewIndividualsBtn");
 const individualOptions = document.getElementById("individualOptions");
+
 const filterCriticalBtn = document.getElementById("filterCriticalBtn");
 const filterAcuteBtn = document.getElementById("filterAcuteBtn");
 
@@ -114,20 +111,24 @@ function deactivateHospitalTypeButtons() {
 // Critical Access toggle
 filterCriticalBtn.addEventListener("click", () => {
   const isActive = filterCriticalBtn.classList.contains("active");
+
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterCriticalBtn.classList.add("active");
   }
+
   console.log("Hospital type selected:", getSelectedHospitalType());
 });
 
 // Acute Care toggle
 filterAcuteBtn.addEventListener("click", () => {
   const isActive = filterAcuteBtn.classList.contains("active");
+
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterAcuteBtn.classList.add("active");
   }
+
   console.log("Hospital type selected:", getSelectedHospitalType());
 });
 
@@ -142,6 +143,7 @@ viewSystemsBtn.addEventListener("click", () => {
   viewSystemsBtn.classList.add("active");
   viewIndividualsBtn.classList.remove("active");
   individualOptions.style.display = "none";
+
   console.log("View set to: Hospital Systems");
   // TODO: Implement system-level rendering
   renderHospitals(hospitalData); // placeholder
@@ -151,6 +153,7 @@ viewIndividualsBtn.addEventListener("click", () => {
   viewIndividualsBtn.classList.add("active");
   viewSystemsBtn.classList.remove("active");
   individualOptions.style.display = "block";
+
   console.log("View set to: Individual Hospitals");
   // TODO: Implement individual rendering with critical/acute filtering
   renderHospitals(hospitalData); // placeholder
@@ -158,6 +161,7 @@ viewIndividualsBtn.addEventListener("click", () => {
 
 function sortAndRender(data) {
   const sortValue = document.getElementById("sortSelect").value;
+
   let sorted = [...data];
 
   if (sortValue === "grade") {
@@ -180,7 +184,6 @@ function sortAndRender(data) {
 // ===============================
 // Apply Filters
 // ===============================
-
 document.getElementById("applyFiltersBtn").addEventListener("click", () => {
   const zip = document.getElementById("zipInput").value.trim();
   const radius = document.getElementById("radiusSelect").value;
@@ -202,23 +205,24 @@ document.getElementById("applyFiltersBtn").addEventListener("click", () => {
 // ===============================
 // Reset Filters
 // ===============================
-
 document.getElementById("resetFiltersBtn").addEventListener("click", () => {
   document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
   document.getElementById("zipInput").value = "";
   document.getElementById("radiusSelect").selectedIndex = 0;
   console.log("Filters reset");
+
   renderHospitals(hospitalData);
 });
 
 // ===============================
 // Download Data (Stub)
 // ===============================
-
 document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
+
+
 
 // ========== HELPERS FOR HOSPITAL DETAILS ==========
 
@@ -234,6 +238,7 @@ function renderGrades(hospital) {
     const grade = hospital[metric];
     const label = metric.replace("TIER_", "Tier ").replace(/_/g, " ");
     const gradeClass = `grade-${grade}`;
+
     return `
       <div class="details-section">
         <h4>${label}</h4>
@@ -245,17 +250,19 @@ function renderGrades(hospital) {
 
 function toggleHospitalDetails(hospitalId, button) {
   const existingRow = document.querySelector(`.details-row[data-id="${hospitalId}"]`);
+
   if (existingRow) {
     existingRow.remove(); // toggle off
     return;
   }
 
-  const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
+  const hospital = hospitalsData.find(h => h.RECORD_ID === hospitalId);
   if (!hospital) return;
 
   const detailsRow = document.createElement("tr");
   detailsRow.classList.add("details-row");
   detailsRow.setAttribute("data-id", hospitalId);
+
   detailsRow.innerHTML = `
     <td colspan="3">
       <div class="hospital-details-dropdown show">
@@ -270,18 +277,3 @@ function toggleHospitalDetails(hospitalId, button) {
   currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
 }
 
-// ===============================
-// Error Popup Utility
-// ===============================
-
-function showErrorPopup(message) {
-  const popup = document.createElement('div');
-  popup.className = 'error-popup';
-  popup.innerHTML = `<p>${message}</p>`;
-  document.body.appendChild(popup);
-  setTimeout(() => popup.classList.add('visible'), 10);
-  setTimeout(() => {
-    popup.classList.remove('visible');
-    setTimeout(() => popup.remove(), 400);
-  }, 4000);
-}
