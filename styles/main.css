@@ -1437,7 +1437,6 @@ body.mobile-filter-open {
         min-height: 44px;
         min-width: 44px;
     }
-
     .toggle-detail,
     .view-full-detail {
         min-height: 44px;
@@ -1445,7 +1444,6 @@ body.mobile-filter-open {
         align-items: center;
         justify-content: center;
     }
-
     .mobile-nav-toggle,
     .mobile-filter-toggle {
         min-height: 50px;
