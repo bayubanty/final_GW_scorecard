@@ -49,8 +49,10 @@ function populateHospitalDropdowns() {
         const name = hospital.Name || 'Unnamed Hospital';
         const location = `${hospital.City || ''}, ${hospital.State || ''}`;
         const optionText = `${name} - ${location}`;
+        
         const option1 = new Option(optionText, hospital.RECORD_ID);
         const option2 = new Option(optionText, hospital.RECORD_ID);
+        
         hospital1Select.add(option1);
         hospital2Select.add(option2);
     });
@@ -296,15 +298,19 @@ function createMetricRow(metric) {
 
 function getFormattedValue(hospital, metric) {
     const value = hospital[metric.key];
+    
     if (metric.format) {
         return metric.format(value);
     }
+    
     if (value === null || value === undefined || value === 'NULL') {
         return 'N/A';
     }
+    
     if (isGradeMetric(metric.key)) {
         return value;
     }
+    
     return value;
 }
 
@@ -323,6 +329,7 @@ function convertGradeToStars(grade) {
         'D+': 2.5, 'D': 2, 'D-': 1.5,
         'F': 1,
     };
+
     const value = gradeMap[grade.trim()] || 0;
     return { value };
 }
