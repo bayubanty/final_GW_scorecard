@@ -38,7 +38,7 @@ function initMobileNavigation() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNavClose = document.querySelector('.mobile-nav-close');
     const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
-
+    
     if (mobileNavToggle && mobileNavOverlay) {
         mobileNavToggle.addEventListener('click', toggleMobileNavigation);
         if (mobileNavClose) {
@@ -54,11 +54,12 @@ function toggleMobileNavigation() {
     const body = document.body;
     const overlay = document.querySelector('.mobile-nav-overlay');
     const panel = document.querySelector('.mobile-nav-panel');
-
+    
     if (!overlay || !panel) return;
-
+    
     body.classList.toggle('mobile-nav-open');
     overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
+    
     setTimeout(() => {
         panel.classList.toggle('active');
     }, 10);
@@ -197,9 +198,10 @@ function toggleMobileFilters() {
     const body = document.body;
     const overlay = document.querySelector('.mobile-filter-overlay');
     const panel = document.querySelector('.mobile-filter-panel');
-
+    
     body.classList.toggle('mobile-filter-open');
     overlay.style.display = body.classList.contains('mobile-filter-open') ? 'block' : 'none';
+    
     setTimeout(() => {
         panel.classList.toggle('active');
         // Sync button states when opening
@@ -215,7 +217,7 @@ function syncFilterInputs() {
     // Sync checkbox states between mobile and desktop
     const desktopCheckboxes = document.querySelectorAll('.sidebar input[type="checkbox"]');
     const mobileCheckboxes = document.querySelectorAll('.mobile-filter-content input[type="checkbox"]');
-
+    
     desktopCheckboxes.forEach((checkbox, index) => {
         if (mobileCheckboxes[index]) {
             mobileCheckboxes[index].checked = checkbox.checked;
@@ -231,7 +233,6 @@ function syncFilterInputs() {
     if (zipInput && mobileZipInput) {
         mobileZipInput.value = zipInput.value;
     }
-
     if (radiusSelect && mobileRadiusSelect) {
         mobileRadiusSelect.value = radiusSelect.value;
     }
@@ -370,7 +371,7 @@ function renderHospitals(data) {
             if (hospital.RECORD_ID) {
                 window.location.href = `details.html?id=${hospital.RECORD_ID}`;
             } else {
-                showErrorPopup('Sorry, we couldn\\'t find more details for this hospital.');
+                showErrorPopup('Sorry, we couldn\'t find more details for this hospital.');
             }
         });
 
@@ -510,6 +511,7 @@ function applyAllFilters() {
 
     // Apply checkbox filters
     const checked = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+    
     if (checked.length > 0) {
         filtered = filtered.filter(hospital => {
             return checked.every(val => {
@@ -530,6 +532,7 @@ function applyAllFilters() {
     // Apply location filter
     const zip = document.getElementById('zipInput').value.trim();
     const radius = document.getElementById('radiusSelect').value;
+    
     if (zip && /^\d{5}$/.test(zip)) {
         const coords = getZipCoords(zip);
         filtered = filtered.filter(hospital => {
@@ -555,9 +558,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 3959; // Earth's radius in miles
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
+    const a = 
         Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
         Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
@@ -748,6 +751,7 @@ function getZipCoords(zip) {
         '31021': [32.5563, -82.8947], // Dublin
         '31792': [30.8365, -83.9787] // Thomasville
     };
+
     const coords = lookup[String(zip)] || [32.5, -83.5]; // Default to central Georgia
     return coords;
 }
@@ -763,12 +767,14 @@ function convertGradeToStars(grade) {
         'D+': 2.5, 'D': 2, 'D-': 1.5,
         'F': 1,
     };
+
     const value = gradeMap[grade.trim()] || 0;
     return { value };
 }
 
 function renderStars(value) {
     let html = '';
+
     for (let i = 1; i <= 5; i++) {
         if (value >= i) {
             html += fullStarSVG();
@@ -778,6 +784,7 @@ function renderStars(value) {
             html += emptyStarSVG();
         }
     }
+
     return html;
 }
 
@@ -819,6 +826,7 @@ function showErrorPopup(message) {
     popup.className = 'error-popup';
     popup.innerHTML = `<p>${message}</p>`;
     document.body.appendChild(popup);
+
     setTimeout(() => popup.classList.add('visible'), 10);
     setTimeout(() => {
         popup.classList.remove('visible');
