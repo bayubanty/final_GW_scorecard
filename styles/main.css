@@ -1,8 +1,6 @@
-
 /* ===============================
 Base Styles
 =============================== */
-
 * {
     margin: 0;
     padding: 0;
@@ -28,7 +26,6 @@ body {
 /* ===============================
 Header
 =============================== */
-
 header {
     background: linear-gradient(#6fb353);
     color: white;
@@ -95,7 +92,6 @@ header {
 /* ===============================
 Three-column Layout (Sidebar | Content | Map)
 =============================== */
-
 .main-content {
     display: grid;
     grid-template-columns: 260px 1fr 350px;
@@ -143,7 +139,6 @@ Three-column Layout (Sidebar | Content | Map)
 /* ===============================
 Map Column --- scrolls naturally
 =============================== */
-
 .map-section h2 {
     background-color: #6fb353;
     color: #fff;
@@ -156,7 +151,6 @@ Map Column --- scrolls naturally
 /* =========================================
 FIX --- Index Page Map Behavior (Safe Scoped)
 ========================================= */
-
 .index-page .map-column {
     position: sticky;
     top: 10px;
@@ -185,7 +179,6 @@ FIX --- Index Page Map Behavior (Safe Scoped)
 /* ===============================
 Sidebar
 =============================== */
-
 .sidebar {
     background: #e7f5e5;
     border: 2px solid #6fb353;
@@ -298,7 +291,6 @@ Sidebar
 /* ===============================
 Filters, Metrics, and Toggles
 =============================== */
-
 .view-toggle {
     background: #e7f5e5;
     padding: 15px;
@@ -341,7 +333,6 @@ Filters, Metrics, and Toggles
 /* ===============================
 Results Table
 =============================== */
-
 .search-section {
     background-color: white;
     padding: 20px;
@@ -394,7 +385,6 @@ Results Table
 /* ===============================
 Buttons (Two per Row)
 =============================== */
-
 .details-buttons {
     display: flex;
     flex-direction: column;
@@ -430,7 +420,6 @@ Buttons (Two per Row)
 /* ===============================
 Detail Rows (Expandable)
 =============================== */
-
 .hospital-detail-row {
     background-color: #f9f9f9;
     border-top: 2px solid #6fb353;
@@ -447,7 +436,6 @@ Detail Rows (Expandable)
 /* ===============================
 Star Ratings
 =============================== */
-
 .star-rating {
     display: flex;
     align-items: center;
@@ -472,7 +460,6 @@ Star Ratings
 /* ===============================
 Footer
 =============================== */
-
 footer {
     background: linear-gradient(#6fb353);
     color: white;
@@ -512,7 +499,6 @@ footer {
 /* ===============================
 Responsive Adjustments
 =============================== */
-
 @media (max-width: 992px) {
     .main-content {
         grid-template-columns: 1fr;
@@ -561,7 +547,6 @@ Responsive Adjustments
 /* ===============================
 Detail Page Styles
 =============================== */
-
 .detail-topbar {
     display: flex;
     align-items: center;
@@ -656,7 +641,6 @@ Detail Page Styles
 /* =========================================
 SERVICES GRID STYLING
 ========================================= */
-
 .services-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -692,7 +676,6 @@ SERVICES GRID STYLING
 }
 
 /* ===== Metrics ===== */
-
 .metrics-wrap {
     width: 100%;
     max-width: none;
@@ -763,7 +746,6 @@ SERVICES GRID STYLING
 /* ===============================
 Methodology Page Styles
 =============================== */
-
 .methodology-hero {
     background: linear-gradient(135deg, #6fb353, #5aa345);
     color: #fff;
@@ -843,7 +825,6 @@ Methodology Page Styles
 }
 
 /* ===== Methodology Download Section ===== */
-
 .methodology-download {
     text-align: center;
     background: #f8f8f8;
@@ -896,7 +877,6 @@ Methodology Page Styles
 /* =========================================
 INDEX PAGE --- LAYOUT + FILTERS
 ========================================= */
-
 /* Smaller, cleaner filter headers */
 .index-page .sidebar summary {
     background: #6fb353;
@@ -954,7 +934,6 @@ INDEX PAGE --- LAYOUT + FILTERS
 /* =========================================
 COLUMN BEHAVIOR (NORMAL SCROLL)
 ========================================= */
-
 .main-content {
     display: grid;
     grid-template-columns: 260px 1fr 350px;
@@ -981,7 +960,6 @@ COLUMN BEHAVIOR (NORMAL SCROLL)
 /* =========================================
 RESULTS BUTTON FIX
 ========================================= */
-
 .details-buttons {
     display: flex;
     flex-direction: column;
@@ -1019,7 +997,6 @@ RESULTS BUTTON FIX
 /* =========================================
 INLINE STAR ALIGNMENT IN PREVIEW PANE
 ========================================= */
-
 .detail-info p.inline-stars {
     display: flex;
     align-items: center;
@@ -1060,7 +1037,6 @@ INLINE STAR ALIGNMENT IN PREVIEW PANE
 /* ===============================
 Mobile Navigation & Layout
 =============================== */
-
 /* Mobile Header Controls - MOVED BELOW HEADER */
 .mobile-header-controls {
     display: none;
@@ -1272,17 +1248,17 @@ Mobile Navigation & Layout
     .map-column {
         display: none;
     }
-    
+
     /* Show mobile controls */
     .mobile-header-controls {
         display: flex;
     }
-    
+
     /* Show mobile map */
     .mobile-map-section {
         display: block;
     }
-    
+
     /* Adjust main content grid for mobile */
     .main-content {
         grid-template-columns: 1fr;
@@ -1290,121 +1266,121 @@ Mobile Navigation & Layout
         margin-top: 0;
         padding: 0 10px;
     }
-    
+
     /* Mobile header adjustments */
     .top-nav {
         flex-direction: column;
         gap: 15px;
         padding: 10px 0;
     }
-    
+
     .logo {
         justify-content: center;
     }
-    
+
     .nav-links {
         display: none; /* Hide desktop nav on mobile */
     }
-    
+
     .header-content {
         padding: 15px 0;
     }
-    
+
     .header-content h1 {
         font-size: 24px;
     }
-    
+
     .header-content p {
         font-size: 16px;
     }
-    
+
     /* Mobile table adjustments */
     .results-table {
         display: block;
         overflow-x: auto;
         font-size: 14px;
     }
-    
+
     .results-table th,
     .results-table td {
         padding: 8px 10px;
         min-width: 80px;
     }
-    
+
     .results-table th:nth-child(2),
     .results-table td:nth-child(2) {
         min-width: 150px;
     }
-    
+
     /* Mobile button adjustments */
     .details-buttons {
         flex-direction: column;
         gap: 5px;
     }
-    
+
     .toggle-detail,
     .view-full-detail {
         width: 100%;
         font-size: 12px;
         padding: 6px 8px;
     }
-    
+
     /* Mobile search section */
     .search-section {
         padding: 15px;
         margin-bottom: 15px;
     }
-    
+
     .results-header {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
     }
-    
+
     .sort-select-label {
         width: 100%;
         justify-content: space-between;
     }
-    
+
     /* Mobile footer */
     .footer-links {
         flex-direction: column;
         gap: 10px;
         text-align: center;
     }
-    
+
     /* Detail page mobile adjustments */
     .detail-topbar {
         flex-direction: column;
         gap: 10px;
         text-align: center;
     }
-    
+
     .detail-topbar h1 {
         font-size: 1.3rem;
         order: -1;
     }
-    
+
     .detail-hero {
         grid-template-columns: 1fr;
         gap: 15px;
         padding: 15px 10px;
     }
-    
+
     .hero-card {
         padding: 12px;
     }
-    
+
     .metrics-wrap {
         padding: 0 10px 20px;
     }
-    
+
     .metric-header {
         flex-direction: column;
         gap: 10px;
         text-align: center;
     }
-    
+
     .services-grid {
         grid-template-columns: 1fr;
     }
@@ -1415,11 +1391,9 @@ Mobile Navigation & Layout
     .main-content {
         grid-template-columns: 240px 1fr 280px;
     }
-    
     .sidebar {
         width: 240px;
     }
-    
     .mobile-header-controls,
     .mobile-map-section {
         display: none;
@@ -1463,7 +1437,7 @@ body.mobile-filter-open {
         min-height: 44px;
         min-width: 44px;
     }
-    
+
     .toggle-detail,
     .view-full-detail {
         min-height: 44px;
@@ -1471,10 +1445,9 @@ body.mobile-filter-open {
         align-items: center;
         justify-content: center;
     }
-    
+
     .mobile-nav-toggle,
     .mobile-filter-toggle {
         min-height: 50px;
     }
 }
-
