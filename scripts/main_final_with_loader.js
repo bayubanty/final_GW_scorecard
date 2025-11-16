@@ -1,6 +1,7 @@
+
 let hospitalsData = [];
 
-fetch('./data/2025/2025_GW_HospitalScores.json')
+fetch('./data/2025/2025_Lown_Index_GA.json')
   .then(response => response.json())
   .then(data => {
     hospitalsData = data;
@@ -566,3 +567,5 @@ function toggleHospitalDetails(hospitalId, button) {
   const currentRow = button.closest("tr");
   currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
 }
+
+
