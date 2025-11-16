@@ -7,6 +7,23 @@ let selectedHospitals = {
   hospital2: null
 };
 
+// Helper functions for field name variations
+function getHospitalName(hospital) {
+  return hospital.Name || hospital.name || hospital.Hospital_Name || hospital.HOSPITAL_NAME || hospital.hospital_name || 'Unnamed Hospital';
+}
+
+function getHospitalId(hospital) {
+  return hospital.RECORD_ID || hospital.record_id || hospital.id || hospital.ID || hospital.Record_ID;
+}
+
+function getHospitalCity(hospital) {
+  return hospital.City || hospital.city || '';
+}
+
+function getHospitalState(hospital) {
+  return hospital.State || hospital.state || '';
+}
+
 // Load hospital data
 document.addEventListener('DOMContentLoaded', function() {
   loadHospitalData();
@@ -22,6 +39,7 @@ async function loadHospitalData() {
     }
     hospitalData = await response.json();
     console.log('Hospital data loaded for comparison:', hospitalData.length, 'hospitals');
+    console.log('First hospital:', hospitalData[0]);
     populateHospitalDropdowns();
   } catch (error) {
     console.error('Error loading hospital data for comparison:', error);
@@ -42,18 +60,20 @@ function populateHospitalDropdowns() {
 
   // Sort hospitals by name for easier selection
   const sortedHospitals = [...hospitalData].sort((a, b) => {
-    const nameA = a.Name || 'Unnamed Hospital';
-    const nameB = b.Name || 'Unnamed Hospital';
+    const nameA = getHospitalName(a);
+    const nameB = getHospitalName(b);
     return nameA.localeCompare(nameB);
   });
 
   // Populate dropdowns
   sortedHospitals.forEach(hospital => {
-    const name = hospital.Name || 'Unnamed Hospital';
-    const location = `${hospital.City || ''}, ${hospital.State || ''}`;
+    const name = getHospitalName(hospital);
+    const location = `${getHospitalCity(hospital)}, ${getHospitalState(hospital)}`;
     const optionText = `${name} - ${location}`;
-    const option1 = new Option(optionText, hospital.RECORD_ID);
-    const option2 = new Option(optionText, hospital.RECORD_ID);
+    const hospitalId = getHospitalId(hospital);
+    
+    const option1 = new Option(optionText, hospitalId);
+    const option2 = new Option(optionText, hospitalId);
     hospital1Select.add(option1);
     hospital2Select.add(option2);
   });
@@ -64,7 +84,10 @@ function initializeEventListeners() {
   document.getElementById('hospital1Select').addEventListener('change', (e) => {
     const hospitalId = e.target.value;
     if (hospitalId) {
-      const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+      const hospital = hospitalData.find(h => {
+        const hId = getHospitalId(h);
+        return String(hId) === String(hospitalId);
+      });
       selectHospital(hospital, 'hospital1');
     } else {
       clearHospitalSelection('hospital1');
@@ -74,7 +97,10 @@ function initializeEventListeners() {
   document.getElementById('hospital2Select').addEventListener('change', (e) => {
     const hospitalId = e.target.value;
     if (hospitalId) {
-      const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+      const hospital = hospitalData.find(h => {
+        const hId = getHospitalId(h);
+        return String(hId) === String(hospitalId);
+      });
       selectHospital(hospital, 'hospital2');
     } else {
       clearHospitalSelection('hospital2');
@@ -114,11 +140,12 @@ function updateSelectedHospitalDisplay(hospital, slot) {
   const container = document.getElementById(`selected${slot.charAt(0).toUpperCase() + slot.slice(1)}`);
   const grade = hospital.TIER_1_GRADE_Lown_Composite || 'N/A';
   const stars = convertGradeToStars(grade);
+  const hospitalName = getHospitalName(hospital);
 
   container.innerHTML = `
     <div class="hospital-preview">
-      <h4>${hospital.Name || 'Unnamed Hospital'}</h4>
-      <div class="location">${hospital.City || ''}, ${hospital.State || ''}</div>
+      <h4>${hospitalName}</h4>
+      <div class="location">${getHospitalCity(hospital)}, ${getHospitalState(hospital)}</div>
       <div class="grade">
         Overall Grade:
         <div class="star-rating">${renderStars(stars.value)}</div>
