@@ -18,6 +18,8 @@ fetch("./data/2025/2025_GW_HospitalScores.json")
     hospitalData = data;
     filteredHospitalData = [...hospitalData];
     console.log("Hospital data loaded:", hospitalData.length, "records");
+    console.log("First hospital:", hospitalData[0]);
+    console.log("Available fields:", Object.keys(hospitalData[0]));
 
     // Initial render
     renderHospitals(hospitalData);
@@ -288,13 +290,14 @@ function updateMobileMapMarkers(data) {
 
     const grade = hospital.TIER_1_GRADE_Lown_Composite || 'N/A';
     const stars = convertGradeToStars(grade);
+    const hospitalName = getHospitalName(hospital);
 
     const popupHTML = `
       <div class="map-popup">
-        <strong>${hospital.Name || 'Unnamed Hospital'}</strong><br>
-        ${hospital.City || ''}, ${hospital.State || ''}<br>
+        <strong>${hospitalName}</strong><br>
+        ${hospital.City || hospital.city || ''}, ${hospital.State || hospital.state || ''}<br>
         <div class="star-rating">${renderStars(stars.value)}</div>
-        <a href="details.html?id=${hospital.RECORD_ID}" class="view-full-detail">
+        <a href="details.html?id=${hospital.RECORD_ID || hospital.record_id || hospital.id}" class="view-full-detail">
           View Full Details
         </a>
       </div>
@@ -316,6 +319,26 @@ function updateMobileMapMarkers(data) {
       mobileMap.invalidateSize();
     }
   }, 100);
+}
+
+// ===============================
+// Hospital Name Helper Function
+// ===============================
+
+function getHospitalName(hospital) {
+  return hospital.Name || hospital.name || hospital.Hospital_Name || hospital.HOSPITAL_NAME || hospital.hospital_name || 'Unnamed Hospital';
+}
+
+function getHospitalId(hospital) {
+  return hospital.RECORD_ID || hospital.record_id || hospital.id || hospital.ID || hospital.Record_ID;
+}
+
+function getHospitalCity(hospital) {
+  return hospital.City || hospital.city || '';
+}
+
+function getHospitalState(hospital) {
+  return hospital.State || hospital.state || '';
 }
 
 // ===============================
@@ -341,6 +364,8 @@ function renderHospitals(data) {
     // Convert letter grade to star rating
     const grade = hospital.TIER_1_GRADE_Lown_Composite || 'N/A';
     const stars = convertGradeToStars(grade);
+    const hospitalName = getHospitalName(hospital);
+    const hospitalId = getHospitalId(hospital);
 
     // === Main Row ===
     const row = document.createElement('tr');
@@ -357,11 +382,11 @@ function renderHospitals(data) {
     const nameCell = document.createElement('td');
     nameCell.innerHTML = `
       <strong>
-        <a href="details.html?id=${hospital.RECORD_ID}" class="hospital-link">
-          ${hospital.Name || 'Unnamed Hospital'}
+        <a href="details.html?id=${hospitalId}" class="hospital-link">
+          ${hospitalName}
         </a>
       </strong><br>
-      ${hospital.City || ''}, ${hospital.State || ''}
+      ${getHospitalCity(hospital)}, ${getHospitalState(hospital)}
     `;
     row.appendChild(nameCell);
 
@@ -377,8 +402,8 @@ function renderHospitals(data) {
     fullDetailsButton.textContent = 'View Full Details';
     fullDetailsButton.classList.add('view-full-detail');
     fullDetailsButton.addEventListener('click', () => {
-      if (hospital.RECORD_ID) {
-        window.location.href = `details.html?id=${hospital.RECORD_ID}`;
+      if (hospitalId) {
+        window.location.href = `details.html?id=${hospitalId}`;
       } else {
         showErrorPopup('Sorry, we couldn\'t find more details for this hospital.');
       }
@@ -595,7 +620,7 @@ function sortAndRender(data) {
   } else if (sortValue === 'distance') {
     // Distance sorting handled in applyAllFilters
   } else if (sortValue === 'name') {
-    sorted.sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
+    sorted.sort((a, b) => (getHospitalName(a)).localeCompare(getHospitalName(b)));
   } else if (sortValue === 'size') {
     const sizeOrder = {'xs': 1, 's': 2, 'm': 3, 'l': 4, 'xl': 5};
     sorted.sort((a, b) => {
@@ -706,19 +731,21 @@ function updateMapMarkers(data) {
     }
 
     if (!lat || !lon) {
-      console.warn('No coordinates for hospital:', hospital.Name);
+      console.warn('No coordinates for hospital:', getHospitalName(hospital));
       return;
     }
 
     const grade = hospital.TIER_1_GRADE_Lown_Composite || 'N/A';
     const stars = convertGradeToStars(grade);
+    const hospitalName = getHospitalName(hospital);
+    const hospitalId = getHospitalId(hospital);
 
     const popupHTML = `
       <div class="map-popup">
-        <strong>${hospital.Name || 'Unnamed Hospital'}</strong><br>
-        ${hospital.City || ''}, ${hospital.State || ''}<br>
+        <strong>${hospitalName}</strong><br>
+        ${getHospitalCity(hospital)}, ${getHospitalState(hospital)}<br>
         <div class="star-rating">${renderStars(stars.value)}</div>
-        <a href="details.html?id=${hospital.RECORD_ID}" class="view-full-detail">
+        <a href="details.html?id=${hospitalId}" class="view-full-detail">
           View Full Details
         </a>
       </div>
