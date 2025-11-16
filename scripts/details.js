@@ -2,6 +2,36 @@
 // Georgia Watch Details Page Script
 // Updated for Lown 2025 dataset structure
 // =======================================
+
+// Helper functions for field name variations
+function getHospitalName(hospital) {
+  return hospital.Name || hospital.name || hospital.Hospital_Name || hospital.HOSPITAL_NAME || hospital.hospital_name || 'Unnamed Hospital';
+}
+
+function getHospitalId(hospital) {
+  return hospital.RECORD_ID || hospital.record_id || hospital.id || hospital.ID || hospital.Record_ID;
+}
+
+function getHospitalCity(hospital) {
+  return hospital.City || hospital.city || '';
+}
+
+function getHospitalState(hospital) {
+  return hospital.State || hospital.state || '';
+}
+
+function getHospitalAddress(hospital) {
+  return hospital.Address || hospital.address || '';
+}
+
+function getHospitalZip(hospital) {
+  return hospital.Zip || hospital.zip || '';
+}
+
+function getHospitalCounty(hospital) {
+  return hospital.County || hospital.county || '---';
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const hospitalId = params.get("id");
@@ -18,8 +48,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     const data = await res.json();
 
-    // Match flexible key names (handles spaces and case)
-    const h = data.find(x => String(x.RECORD_ID) === String(hospitalId));
+    // Find hospital by ID with multiple field name variations
+    const h = data.find(x => {
+      const recordId = getHospitalId(x);
+      return String(recordId) === String(hospitalId);
+    });
 
     if (!h) {
       console.error("Hospital not found for ID:", hospitalId);
@@ -34,22 +67,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
 
     // ===== Hospital Name =====
-    const hospitalName = h.Name || "Unnamed Hospital";
+    const hospitalName = getHospitalName(h);
     const nameEl = document.getElementById("hospitalName");
     if (nameEl) nameEl.textContent = hospitalName;
 
     // ===== Address =====
     const streetEl = document.getElementById("streetLine");
-    if (streetEl) streetEl.textContent = h.Address || "---";
+    if (streetEl) streetEl.textContent = getHospitalAddress(h) || "---";
 
     const cityStateZipEl = document.getElementById("cityStateZip");
-    if (cityStateZipEl)
-      cityStateZipEl.textContent = [h.City, h.State, h.Zip].filter(Boolean).join(", ");
+    if (cityStateZipEl) {
+      const city = getHospitalCity(h);
+      const state = getHospitalState(h);
+      const zip = getHospitalZip(h);
+      cityStateZipEl.textContent = [city, state, zip].filter(Boolean).join(", ");
+    }
 
     // ===== Hospital Info =====
     const infoMap = {
       // ===== County =====
-      hospitalCounty: h.County || "---",
+      hospitalCounty: getHospitalCounty(h),
 
       // ===== Bed Size / Hospital Size =====
       hospitalSize: (() => {
@@ -131,8 +168,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rawServices =
       h["SERVICES"] ||
       h["Services"] ||
+      h["services"] ||
       h["Services Offered"] ||
-      h["Service List"];
+      h["Service List"] ||
+      h["service_list"];
 
     if (typeof rawServices === "string" && rawServices.trim() && rawServices.toUpperCase() !== "NULL") {
       const parsed = rawServices.split(",").map(s => s.trim()).filter(Boolean);
@@ -195,7 +234,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       let lat = parseFloat(h["Latitude"]);
       let lon = parseFloat(h["Longitude"]);
       if (!lat || !lon) {
-        const coords = getZipCoords(h.Zip);
+        const coords = getZipCoords(getHospitalZip(h));
         lat = coords[0];
         lon = coords[1];
       }
